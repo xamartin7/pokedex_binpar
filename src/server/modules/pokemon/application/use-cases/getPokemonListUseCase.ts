@@ -9,8 +9,8 @@ export class GetPokemonListUseCase implements IGetPokemonListUseCase {
     this.pokemonRepository = pokemonRepository;
   }
 
-  async execute(): Promise<Pokemon[]> {
-    const pokemon = await this.pokemonRepository.findAllByGeneration(1);
+  async getByGeneration(generationId: number): Promise<Pokemon[]> {
+    const pokemon = await this.pokemonRepository.findAllByGeneration(generationId);
     return pokemon;
   }
 }

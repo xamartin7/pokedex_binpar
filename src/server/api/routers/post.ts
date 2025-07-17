@@ -5,6 +5,18 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
+import { GetPokemonsRepository } from "@/server/modules/pokemon/infrastructure/repositories/GetPokemonsRepository";
+import { GetPokemonListUseCase } from "@/server/modules/pokemon/application/use-cases/getPokemonListUseCase";
+
+const pokemonRepository = new GetPokemonsRepository()
+const getPokemonListUseCase = new GetPokemonListUseCase(pokemonRepository)
+
+export const pokemonRouter = createTRPCRouter({
+  getPokemonList: publicProcedure.input(z.object({ generationId: z.number() })).query(async ({ input }) => {
+    const pokemonList = await getPokemonListUseCase.getByGeneration(input.generationId)
+    return pokemonList
+  })
+})
 
 export const postRouter = createTRPCRouter({
   hello: publicProcedure
