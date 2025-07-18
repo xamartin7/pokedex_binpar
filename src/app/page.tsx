@@ -13,12 +13,15 @@ export default async function Home() {
   }*/
 
   const pokemonList = await api.pokemon.getPokemonList({ generationId: 1 });
-  console.log(pokemonList)
+  const generations = await api.pokemon.getGenerations();
+  const types = await api.pokemon.getTypes({ generationId: 1 });
 
   return (
     <div>
       <h1>Hello World</h1>
       <pre>{JSON.stringify(pokemonList, null, 2)}</pre>
+      <pre>{JSON.stringify(generations, null, 2)}</pre>
+      <pre>{JSON.stringify(types, null, 2)}</pre>
     </div>
   );
 }
