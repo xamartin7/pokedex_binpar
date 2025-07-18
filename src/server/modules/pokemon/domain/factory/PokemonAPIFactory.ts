@@ -19,6 +19,7 @@ export class PokemonAPIFactory implements IPokemonFactory {
         const pokemon: Pokemon = {
             id: pokemonId,
             name: pokemonDetails.name,
+            image: pokemonDetails.sprites.front_default ?? '',
             type: pokemonDetails.types[0]?.type.name ?? 'unknown',
             generation: pokemonSpecies.generation.name,
             evolutionChain: []
