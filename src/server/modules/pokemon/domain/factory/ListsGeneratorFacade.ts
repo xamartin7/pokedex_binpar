@@ -14,9 +14,11 @@ export class ListsGeneratorFacade {
     async generateListByGeneration(generationId: number): Promise<Pokemon[]> {
         const generation = await this.pokeApiRepository.getOneGeneration(`https://pokeapi.co/api/v2/generation/${generationId}`)
         const pokemons = await Promise.all(generation.pokemon_species.map(async (pokemon) => {
-            const pokemonId = Number(pokemon.url.split('/').pop())
+            const pokemonId = Number(pokemon.url.split('/')[6])
             return this.pokemonFactory.createPokemon(pokemonId)
         }))
+        
+        pokemons.sort((a, b) => a.id - b.id)
         return pokemons
     }
 }
