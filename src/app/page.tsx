@@ -1,20 +1,19 @@
-import Link from "next/link";
+"use client";
 
-import { LatestPost } from "@/app/_components/post";
-import { auth } from "@/server/auth";
-import { api, HydrateClient } from "@/trpc/server";
+import { api } from "@/trpc/react";
+import { InitialLoading } from "./_components/InitialLoading";
 
-export default async function Home() {
-  /*const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await auth();
+export default function Home() {
+  // TODO Use cache
+  const { data: pokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery({ generationId: 1 });
+  const { data: generations, isLoading: generationsLoading } = api.pokemon.getGenerations.useQuery();
+  const { data: types, isLoading: typesLoading } = api.pokemon.getTypes.useQuery({ generationId: 1 });
 
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
-  }*/
+  const isLoading = pokemonLoading || generationsLoading || typesLoading;
 
-  const pokemonList = await api.pokemon.getPokemonList({ generationId: 1 });
-  const generations = await api.pokemon.getGenerations();
-  const types = await api.pokemon.getTypes({ generationId: 1 });
+  if (isLoading) {
+    return <InitialLoading />;
+  }
 
   return (
     <div>
