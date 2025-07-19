@@ -2,6 +2,7 @@
 
 import { api } from "@/trpc/react";
 import { InitialLoading } from "./_components/InitialLoading";
+import { PokemonList } from "./_components/PokemonList";
 
 export default function Home() {
   // TODO Use cache
@@ -17,10 +18,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Hello World</h1>
-      <pre>{JSON.stringify(pokemonList, null, 2)}</pre>
-      <pre>{JSON.stringify(generations, null, 2)}</pre>
-      <pre>{JSON.stringify(types, null, 2)}</pre>
+      <PokemonList initialData={{ pokemonList: pokemonList ?? [], generations: generations ?? [], types: types ?? [] }} />
     </div>
   );
 }
