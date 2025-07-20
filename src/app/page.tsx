@@ -3,6 +3,7 @@
 import { api } from "@/trpc/react";
 import { InitialLoading } from "./_components/InitialLoading";
 import { PokemonList } from "./_components/PokemonList";
+import { TitlePage } from "./_components/TitlePage";
 
 export default function Home() {
   // TODO Use cache
@@ -17,7 +18,8 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen py-8">
+      <TitlePage title="Pokédex" />
       <PokemonList initialData={{ pokemonList: pokemonList ?? [], generations: generations ?? [], types: types ?? [] }} />
     </div>
   );
