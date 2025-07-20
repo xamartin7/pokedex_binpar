@@ -51,27 +51,33 @@ export function PokemonList({initialData}: {initialData: {pokemonList: Pokemon[]
     
     return range;
   };
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header with pagination controls */}
-        <div className="mb-4">
+        {/* Header with controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <PageSizeSelector pageSize={pageSize} handlePageSizeChange={handlePageSizeChange} />
+          <PaginationControls 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            handlePageChange={handlePageChange} 
+            getPaginationRange={getPaginationRange} 
+            pageSize={pageSize} 
+            pokemonList={pokemonList} 
+          />
         </div>
-        <div className="text-sm text-gray-600 mb-4">
-            Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, pokemonList.length)} of {pokemonList.length} Pokémon
+        
+        {/* Results info */}
+        <div className="text-sm text-gray-600 mb-6">
+          Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, pokemonList.length)} of {pokemonList.length} Pokémon
         </div>
 
         {/* Pokemon Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {paginatedData.map((pokemon) => (
             <PokemonCard key={pokemon.id} pokemon={pokemon} />
           ))}
-        </div>
-
-        {/* Pagination Controls */}
-        <div className="flex justify-center">
-          <PaginationControls currentPage={currentPage} totalPages={totalPages} handlePageChange={handlePageChange} getPaginationRange={getPaginationRange} pageSize={pageSize} pokemonList={pokemonList} />
         </div>
       </div>
     </div>
