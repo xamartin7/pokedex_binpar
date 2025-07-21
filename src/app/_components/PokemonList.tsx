@@ -3,8 +3,7 @@ import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 import { useState, useMemo } from "react";
 import { PokemonCard } from "./PokemonCard";
 import type { Type } from "@/server/modules/types/domain/entities/Type";
-import { PageSizeSelector } from "./PageSizeSelector";
-import { PaginationControls } from "./PaginationControls";
+import { PaginationSection } from "./PaginationSection";
 import { Filters } from "./Filters";
 
 export function PokemonList({initialData}: {initialData: {pokemonList: Pokemon[], generations: Generation[], types: Type[]}}) {
@@ -59,22 +58,17 @@ export function PokemonList({initialData}: {initialData: {pokemonList: Pokemon[]
         {/* Filters */}
         <Filters generations={generations} types={types} pokemonList={pokemonList} setPokemonList={setPokemonList} />
 
-        {/* Header with controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <PageSizeSelector pageSize={pageSize} handlePageSizeChange={handlePageSizeChange} />
-          <PaginationControls 
-            currentPage={currentPage} 
-            totalPages={totalPages} 
-            handlePageChange={handlePageChange} 
-            getPaginationRange={getPaginationRange} 
-            pageSize={pageSize} 
-            pokemonList={pokemonList} 
+        {/* Pagination Section */}
+        <div className="mb-6">
+          <PaginationSection
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            pokemonList={pokemonList}
+            handlePageChange={handlePageChange}
+            handlePageSizeChange={handlePageSizeChange}
+            getPaginationRange={getPaginationRange}
           />
-        </div>
-
-        {/* Results info */}
-        <div className="text-sm text-gray-600 mb-6">
-          Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, pokemonList.length)} of {pokemonList.length} Pokémon
         </div>
 
         {/* Pokemon Grid */}
