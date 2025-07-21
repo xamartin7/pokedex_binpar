@@ -19,37 +19,9 @@ export function PokemonList({initialData}: {initialData: {pokemonList: Pokemon[]
     return pokemonList.slice(startIndex, endIndex);
   }, [pokemonList, currentPage, pageSize]);
 
-  const totalPages = Math.ceil(pokemonList.length / pageSize);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // Scroll to top when page changes
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handlePageSizeChange = (newPageSize: number) => {
+  const handlePaginationChange = (newCurrentPage: number, newPageSize: number) => {
+    setCurrentPage(newCurrentPage);
     setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when changing page size
-  };
-
-  const getPaginationRange = () => {
-    const range = [];
-    const maxVisible = 5;
-    
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        range.push(i);
-      }
-    } else {
-      const start = Math.max(1, currentPage - 2);
-      const end = Math.min(totalPages, start + maxVisible - 1);
-      
-      for (let i = start; i <= end; i++) {
-        range.push(i);
-      }
-    }
-    
-    return range;
   };
 
   return (
@@ -61,13 +33,9 @@ export function PokemonList({initialData}: {initialData: {pokemonList: Pokemon[]
         {/* Pagination Section */}
         <div className="mb-6">
           <PaginationSection
-            currentPage={currentPage}
-            totalPages={totalPages}
-            pageSize={pageSize}
             pokemonList={pokemonList}
-            handlePageChange={handlePageChange}
-            handlePageSizeChange={handlePageSizeChange}
-            getPaginationRange={getPaginationRange}
+            onPaginationChange={handlePaginationChange}
+            initialPageSize={12}
           />
         </div>
 

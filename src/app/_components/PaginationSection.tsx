@@ -1,26 +1,59 @@
 import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
+import { useState, useEffect } from "react";
 
 const PAGE_SIZE_OPTIONS = [6, 12, 18, 24, 30];
 
 interface PaginationSectionProps {
-  currentPage: number;
-  totalPages: number;
-  pageSize: number;
   pokemonList: Pokemon[];
-  handlePageChange: (page: number) => void;
-  handlePageSizeChange: (newPageSize: number) => void;
-  getPaginationRange: () => number[];
+  onPaginationChange: (currentPage: number, pageSize: number) => void;
+  initialPageSize?: number;
 }
 
 export function PaginationSection({
-  currentPage,
-  totalPages,
-  pageSize,
   pokemonList,
-  handlePageChange,
-  handlePageSizeChange,
-  getPaginationRange,
+  onPaginationChange,
+  initialPageSize = 12,
 }: PaginationSectionProps) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(initialPageSize);
+
+  const totalPages = Math.ceil(pokemonList.length / pageSize);
+
+  // Notify parent component when pagination changes
+  useEffect(() => {
+    onPaginationChange(currentPage, pageSize);
+  }, [currentPage, pageSize, onPaginationChange]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const getPaginationRange = () => {
+    const range = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        range.push(i);
+      }
+    } else {
+      const start = Math.max(1, currentPage - 2);
+      const end = Math.min(totalPages, start + maxVisible - 1);
+      
+      for (let i = start; i <= end; i++) {
+        range.push(i);
+      }
+    }
+    
+    return range;
+  };
   const startIndex = (currentPage - 1) * pageSize + 1;
   const endIndex = Math.min(currentPage * pageSize, pokemonList.length);
   const totalItems = pokemonList.length;
