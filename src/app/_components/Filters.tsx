@@ -64,7 +64,17 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
   };
 
   return (
-    <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm">
+    <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm relative">
+      {/* Loading Overlay */}
+      {pokemonLoading && (
+        <div className="absolute inset-0 bg-gray-50/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+          <div className="flex flex-col items-center space-y-2">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <p className="text-sm text-gray-600 font-medium">Loading Pokemon...</p>
+          </div>
+        </div>
+      )}
+      
       <h2 className="text-xl font-semibold mb-4 text-gray-800">Filters</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -78,6 +88,7 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
             value={selectedGeneration}
             onChange={handleGenerationChange}
             className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            disabled={pokemonLoading}
           >
             {generations.map((generation) => (
               <option key={`generation-${generation.id}`} value={generation.id.toString()}>
@@ -97,6 +108,7 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
             value={selectedType}
             onChange={handleTypeChange}
             className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            disabled={pokemonLoading}
           >
             <option key="all-types" value="">All Types</option>
             {types.map((type) => (
@@ -120,6 +132,7 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
           onChange={handleSearchChange}
           placeholder="Search by name or evolution..."
           className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          disabled={pokemonLoading}
         />
         <p className="mt-1 text-xs text-gray-500">
           Type to search Pokemon names and their evolutions in real time
