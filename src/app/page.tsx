@@ -14,10 +14,20 @@ export default function Home() {
   // Load data with individual loading states and custom cache settings
   const { data: generations, isLoading: generationsLoading } = api.pokemon.getGenerations.useQuery(
     undefined, // no input parameters
+    {
+      enabled: true,
+      staleTime: 60 * 60 * 1000, // 1 hour cache
+      gcTime: 60 * 60 * 1000 * 24, // 24 hours cache
+    }
   );
   
   const { data: types, isLoading: typesLoading } = api.pokemon.getTypes.useQuery(
     { generationId: DEFAULT_GENERATION_ID },
+    {
+      enabled: true,
+      staleTime: 60 * 60 * 1000, // 1 hour cache
+      gcTime: 60 * 60 * 1000 * 24, // 24 hours cache
+    }
   );
   
   const { data: pokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery(
