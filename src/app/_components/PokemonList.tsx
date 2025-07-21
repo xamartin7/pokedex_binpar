@@ -14,25 +14,27 @@ interface PokemonListProps {
   };
 }
 
+const INITIAL_PAGE_SIZE = 12;
+
 export function PokemonList({initialData}: PokemonListProps) {
   const [pokemonList, setPokemonList] = useState<Pokemon[]>(initialData.pokemonList);
   const [pokemonListFiltered, setPokemonListFiltered] = useState<Pokemon[]>(initialData.pokemonList);
   const [generations, setGenerations] = useState<Generation[]>(initialData.generations);
   const [types, setTypes] = useState<Type[]>(initialData.types);
-  const [paginatedData, setPaginatedData] = useState<Pokemon[]>(initialData.pokemonList.slice(0, 12));
+  const [paginatedData, setPaginatedData] = useState<Pokemon[]>(initialData.pokemonList.slice(0, INITIAL_PAGE_SIZE));
 
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Filters */}
-        <Filters generations={generations} types={types} setPokemonListFiltered={setPokemonListFiltered} initialPokemonList={pokemonList} />
+        <Filters generations={generations} types={types} setPokemonListFiltered={setPokemonListFiltered} initialPokemonList={pokemonList} filteredPokemonList={pokemonListFiltered} setInitialPokemonList={setPokemonList} />
 
         {/* Pagination Section */}
         <div className="mb-6">
           <PaginationSection
             pokemonList={pokemonListFiltered}
             onPaginatedDataChange={setPaginatedData}
-            initialPageSize={12}
+            initialPageSize={INITIAL_PAGE_SIZE}
           />
         </div>
 

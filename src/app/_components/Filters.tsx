@@ -11,9 +11,11 @@ interface FiltersProps {
     types: Type[];
     setPokemonListFiltered: (pokemonList: Pokemon[]) => void;
     initialPokemonList: Pokemon[];
+    filteredPokemonList: Pokemon[];
+    setInitialPokemonList: (pokemonList: Pokemon[]) => void;
 }
 
-export function Filters({generations, types, setPokemonListFiltered, initialPokemonList}: FiltersProps) {
+export function Filters({generations, types, setPokemonListFiltered, initialPokemonList, filteredPokemonList, setInitialPokemonList}: FiltersProps) {
   const [selectedGeneration, setSelectedGeneration] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
@@ -28,12 +30,13 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
   useEffect(() => {
     if (selectedGeneration === "") {
       // If no generation selected, use initial list
-      setPokemonListFiltered(initialPokemonList);
+      setInitialPokemonList(initialPokemonList);
     } else if (generationPokemonList) {
       // If generation selected and data is available, use generation data
+      setInitialPokemonList(generationPokemonList);
       setPokemonListFiltered(generationPokemonList);
     }
-  }, [selectedGeneration, generationPokemonList, initialPokemonList, setPokemonListFiltered]);
+  }, [selectedGeneration, generationPokemonList, initialPokemonList, setInitialPokemonList, setPokemonListFiltered]);
 
   const handleGenerationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedGeneration(event.target.value);
@@ -61,6 +64,33 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
+    const searchTerm = event.target.value.toLowerCase();
+    
+    if (searchTerm === "") {
+      // If search is empty, show all Pokemon
+      setPokemonListFiltered(initialPokemonList);
+      return;
+    }
+    
+    // Find Pokemon that match the search term
+    const matchingPokemon = initialPokemonList.filter((pokemon) => {
+      const pokemonNameMatches = pokemon.name.toLowerCase().includes(searchTerm);
+      return pokemonNameMatches;
+    });
+
+    // Get all evolution chains from matching Pokemon
+    const allEvolutionPokemon: Pokemon[] = [];
+    matchingPokemon.forEach((pokemon) => {
+      // Add all Pokemon from the evolution chain
+      allEvolutionPokemon.push(...pokemon.evolutionChain);
+    });
+
+    // Remove duplicates based on Pokemon name
+    const uniqueEvolutionPokemon = allEvolutionPokemon.filter((pokemon, index, self) => 
+      index === self.findIndex((p) => p.name === pokemon.name)
+    );
+
+    setPokemonListFiltered(uniqueEvolutionPokemon);
   };
 
   return (
