@@ -23,7 +23,11 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
   // Move the useQuery hook to the top level
   const { data: generationPokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery(
     { generationId: Number(selectedGeneration) },
-    { enabled: selectedGeneration !== "" } // Only run query when generation is selected
+    { 
+      enabled: selectedGeneration !== "",
+      staleTime: 60 * 60 * 1000, // 1 hour cache
+      gcTime: 60 * 60 * 1000, // 1 hour cache
+    } // Only run query when generation is selected
   );
 
   // Update filtered list when generation data changes
