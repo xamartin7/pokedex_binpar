@@ -1,5 +1,6 @@
 import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 import Image from "next/image";
+import Link from "next/link";
 
 const typeColors: Record<string, string> = {
   fire: "bg-red-500",
@@ -24,52 +25,54 @@ const typeColors: Record<string, string> = {
 
 export function PokemonCard({pokemon}: {pokemon: Pokemon}) {
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200">
-      <div className="relative h-48 bg-gray-50 flex items-center justify-center">
-        <Image 
-          src={pokemon.image} 
-          alt={pokemon.name} 
-          width={120} 
-          height={120}
-          className="object-contain hover:scale-110 transition-transform duration-300"
-        />
-      </div>
-      
-      <div className="p-4">
-        <h3 className="text-xl font-bold text-gray-800 mb-2 capitalize">
-          {pokemon.name}
-        </h3>
+    <Link href={`/${pokemon.id}`} className="block">
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200 cursor-pointer">
+        <div className="relative h-48 bg-gray-50 flex items-center justify-center">
+          <Image 
+            src={pokemon.image} 
+            alt={pokemon.name} 
+            width={120} 
+            height={120}
+            className="object-contain hover:scale-110 transition-transform duration-300"
+          />
+        </div>
         
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600 font-medium">Type:</span>
-            <div className="flex gap-1 flex-wrap">
-              {pokemon.types.map((type) => {
-                const typeColor = typeColors[type.name.toLowerCase()] ?? "bg-gray-500";
-                return (
-                  <span 
-                    key={type.id}
-                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${typeColor} capitalize`}
-                  >
-                    {type.name}
-                  </span>
-                );
-              })}
+        <div className="p-4">
+          <h3 className="text-xl font-bold text-gray-800 mb-2 capitalize">
+            {pokemon.name}
+          </h3>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 font-medium">Type:</span>
+              <div className="flex gap-1 flex-wrap">
+                {pokemon.types.map((type) => {
+                  const typeColor = typeColors[type.name.toLowerCase()] ?? "bg-gray-500";
+                  return (
+                    <span 
+                      key={type.id}
+                      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${typeColor} capitalize`}
+                    >
+                      {type.name}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 font-medium">Generation:</span>
+              <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-medium">
+                {pokemon.generation.name}
+              </span>
             </div>
           </div>
           
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600 font-medium">Generation:</span>
-            <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-medium">
-              {pokemon.generation.name}
-            </span>
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <span className="text-xs text-gray-500">#{pokemon.id.toString().padStart(3, '0')}</span>
           </div>
         </div>
-        
-        <div className="mt-3 pt-3 border-t border-gray-100">
-          <span className="text-xs text-gray-500">#{pokemon.id.toString().padStart(3, '0')}</span>
-        </div>
       </div>
-    </div>
+    </Link>
   );
 }

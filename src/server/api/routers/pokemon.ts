@@ -6,11 +6,16 @@ import { PokemonAPIFactory } from "@/server/modules/pokemon/domain/factory/Pokem
 import { PokeApiRepository } from "@/server/modules/pokemon/infrastructure/repositories/PokeApiRepository"
 import { GetGenerationsUseCase } from "@/server/modules/generations/application/use-cases/GetGenerationsUseCase"
 import { GetTypesUseCase } from "@/server/modules/types/application/use-cases/GetTypesUseCase"
+import { EvolutionChainGenerator } from "@/server/modules/pokemon/domain/factory/EvolutionChainGenerator"
+import { GetPokemonDetailsUseCase } from "@/server/modules/pokemon/application/use-cases/GetPokemonDetailsUseCase"
 
 const pokemonFactory = new PokemonAPIFactory(new PokeApiRepository())
 const getPokemonListUseCase = new GetPokemonListUseCase(new ListsGeneratorFacade(pokemonFactory, new PokeApiRepository()))
 const getGenerationsUseCase = new GetGenerationsUseCase(new PokeApiRepository())
 const getTypesUseCase = new GetTypesUseCase(new PokeApiRepository())
+
+const getPokemonDetailsUseCase = new GetPokemonDetailsUseCase(pokemonFactory, new EvolutionChainGenerator(pokemonFactory, new PokeApiRepository()))
+
 
 export const pokemonRouter = createTRPCRouter({
     getPokemonList: publicProcedure.input(z.object({ generationId: z.number() })).query(async ({ input }) => {
@@ -24,5 +29,9 @@ export const pokemonRouter = createTRPCRouter({
     getTypes: publicProcedure.input(z.object({ generationId: z.number() })).query(async ({ input }) => {
       const types = await getTypesUseCase.getTypes(input.generationId)
       return types
+    }),
+    getPokemonDetails: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+      const pokemonDetails = await getPokemonDetailsUseCase.execute(input.id)
+      return pokemonDetails
     })
   })
