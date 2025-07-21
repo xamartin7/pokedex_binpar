@@ -45,13 +45,13 @@ export function PokemonCard({pokemon}: {pokemon: Pokemon}) {
             <span className="text-sm text-gray-600 font-medium">Type:</span>
             <div className="flex gap-1 flex-wrap">
               {pokemon.types.map((type) => {
-                const typeColor = typeColors[type.toLowerCase()] ?? "bg-gray-500";
+                const typeColor = typeColors[type.name.toLowerCase()] ?? "bg-gray-500";
                 return (
                   <span 
-                    key={type}
+                    key={type.id}
                     className={`px-3 py-1 rounded-full text-white text-sm font-medium ${typeColor} capitalize`}
                   >
-                    {type.toLowerCase()}
+                    {type.name}
                   </span>
                 );
               })}
@@ -61,7 +61,7 @@ export function PokemonCard({pokemon}: {pokemon: Pokemon}) {
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 font-medium">Generation:</span>
             <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-medium">
-              {pokemon.generation}
+              {pokemon.generation.name}
             </span>
           </div>
         </div>

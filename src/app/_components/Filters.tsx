@@ -29,8 +29,8 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
       setPokemonListFiltered(initialPokemonList);
     } else {
       setPokemonListFiltered(initialPokemonList.filter(
-        (pokemon) => pokemon.types.some((type) => type.toLowerCase() === event.target.value.toLowerCase()))
-      );
+        (pokemon) => pokemon.types.some((type) => type.id === parseInt(event.target.value))
+      ));
     }
   };
 
@@ -75,7 +75,7 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
           >
             <option key="all-types" value="">All Types</option>
             {types.map((type) => (
-              <option key={`type-${type.id}`} value={type.name}>
+              <option key={`type-${type.id}`} value={type.id}>
                 {type.name}
               </option>
             ))}

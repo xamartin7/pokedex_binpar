@@ -20,8 +20,16 @@ export class PokemonAPIFactory implements IPokemonFactory {
             id: pokemonId,
             name: pokemonDetails.name,
             image: pokemonDetails.sprites.front_default ?? '',
-            types: pokemonDetails.types.map((type) => type.type.name),
-            generation: pokemonSpecies.generation.name,
+            types: pokemonDetails.types.map((type) => ({
+                id: Number(type.type.url.split('/')[6]),
+                name: type.type.name,
+                url: type.type.url
+            })),
+            generation: {
+                id: Number(pokemonSpecies.generation.url.split('/')[6]),
+                name: pokemonSpecies.generation.name,
+                url: pokemonSpecies.generation.url
+            },
             evolutionChain: []
         }
 

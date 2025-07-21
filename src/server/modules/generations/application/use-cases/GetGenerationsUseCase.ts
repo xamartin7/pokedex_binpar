@@ -15,7 +15,8 @@ export class GetGenerationsUseCase implements IGetGenerationsUseCase {
             const id = Number(generation.url.split('/')[6])
             return {
                 id,
-                name: generation.name
+                name: generation.name,
+                url: generation.url
             }
         })
     }

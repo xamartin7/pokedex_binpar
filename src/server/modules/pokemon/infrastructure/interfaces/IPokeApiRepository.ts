@@ -36,6 +36,7 @@ export interface PokemonDetailsResponse {
     types: {
         type: {
             name: string
+            url: string
         }
     }[]
 }
