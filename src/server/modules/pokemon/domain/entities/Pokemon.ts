@@ -2,7 +2,7 @@ export interface Pokemon {
   id: number;
   name: string;
   image: string;
-  type: string;
+  types: string[];
   generation: string;
   evolutionChain: Pokemon[];
 }

@@ -5,6 +5,7 @@ import { PokemonCard } from "./PokemonCard";
 import type { Type } from "@/server/modules/types/domain/entities/Type";
 import { PageSizeSelector } from "./PageSizeSelector";
 import { PaginationControls } from "./PaginationControls";
+import { Filters } from "./Filters";
 
 export function PokemonList({initialData}: {initialData: {pokemonList: Pokemon[], generations: Generation[], types: Type[]}}) {
   const [pokemonList, setPokemonList] = useState<Pokemon[]>(initialData.pokemonList);
@@ -55,6 +56,9 @@ export function PokemonList({initialData}: {initialData: {pokemonList: Pokemon[]
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Filters */}
+        <Filters generations={generations} types={types} pokemonList={pokemonList} setPokemonList={setPokemonList} />
+
         {/* Header with controls */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <PageSizeSelector pageSize={pageSize} handlePageSizeChange={handlePageSizeChange} />
@@ -67,7 +71,7 @@ export function PokemonList({initialData}: {initialData: {pokemonList: Pokemon[]
             pokemonList={pokemonList} 
           />
         </div>
-        
+
         {/* Results info */}
         <div className="text-sm text-gray-600 mb-6">
           Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, pokemonList.length)} of {pokemonList.length} Pokémon

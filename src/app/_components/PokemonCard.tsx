@@ -23,8 +23,6 @@ const typeColors: Record<string, string> = {
 };
 
 export function PokemonCard({pokemon}: {pokemon: Pokemon}) {
-  const typeColor = typeColors[pokemon.type.toLowerCase()] ?? "bg-gray-500";
-  
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200">
       <div className="relative h-48 bg-gray-50 flex items-center justify-center">
@@ -45,9 +43,19 @@ export function PokemonCard({pokemon}: {pokemon: Pokemon}) {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600 font-medium">Type:</span>
-            <span className={`px-3 py-1 rounded-full text-white text-sm font-medium ${typeColor} capitalize`}>
-              {pokemon.type}
-            </span>
+            <div className="flex gap-1 flex-wrap">
+              {pokemon.types.map((type) => {
+                const typeColor = typeColors[type.toLowerCase()] ?? "bg-gray-500";
+                return (
+                  <span 
+                    key={type}
+                    className={`px-3 py-1 rounded-full text-white text-sm font-medium ${typeColor} capitalize`}
+                  >
+                    {type.toLowerCase()}
+                  </span>
+                );
+              })}
+            </div>
           </div>
           
           <div className="flex items-center justify-between">

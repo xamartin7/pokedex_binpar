@@ -12,7 +12,7 @@ export class GetGenerationsUseCase implements IGetGenerationsUseCase {
     async getGenerations(): Promise<Generation[]> {
         const generations = await this.pokeApiRepository.getGenerations()
         return generations.results.map((generation) => {
-            const id = Number(generation.url.split('/').pop())
+            const id = Number(generation.url.split('/')[6])
             return {
                 id,
                 name: generation.name

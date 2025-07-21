@@ -20,7 +20,7 @@ export class PokemonAPIFactory implements IPokemonFactory {
             id: pokemonId,
             name: pokemonDetails.name,
             image: pokemonDetails.sprites.front_default ?? '',
-            type: pokemonDetails.types[0]?.type.name ?? 'unknown',
+            types: pokemonDetails.types.map((type) => type.type.name),
             generation: pokemonSpecies.generation.name,
             evolutionChain: []
         }

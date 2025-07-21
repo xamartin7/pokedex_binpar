@@ -12,7 +12,7 @@ export class GetTypesUseCase implements IGetTypesUseCase {
     async getTypes(generationId: number): Promise<Type[]> {
         const generation = await this.pokeApiRepository.getOneGeneration(`https://pokeapi.co/api/v2/generation/${generationId}`)
         return generation.types.map((type) => {
-            const id = Number(type.url.split('/').pop())
+            const id = Number(type.url.split('/')[6])
             return {
                 id,
                 name: type.name
