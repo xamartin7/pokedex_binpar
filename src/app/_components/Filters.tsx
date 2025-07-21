@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Generation } from "@/server/modules/generations/domain/entities/Generation";
 import type { Type } from "@/server/modules/types/domain/entities/Type";
 import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
+import { api } from "@/trpc/react";
 
 interface FiltersProps {
     generations: Generation[];
@@ -17,18 +18,42 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
   const [selectedType, setSelectedType] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
 
+  // Move the useQuery hook to the top level
+  const { data: generationPokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery(
+    { generationId: Number(selectedGeneration) },
+    { enabled: selectedGeneration !== "" } // Only run query when generation is selected
+  );
+
+  // Update filtered list when generation data changes
+  useEffect(() => {
+    if (selectedGeneration === "") {
+      // If no generation selected, use initial list
+      setPokemonListFiltered(initialPokemonList);
+    } else if (generationPokemonList) {
+      // If generation selected and data is available, use generation data
+      setPokemonListFiltered(generationPokemonList);
+    }
+  }, [selectedGeneration, generationPokemonList, initialPokemonList, setPokemonListFiltered]);
+
   const handleGenerationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedGeneration(event.target.value);
-    // TODO: Call to backend
+    // Reset type filter when generation changes
+    setSelectedType("");
   };
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);
+    
+    // Determine which list to filter based on current state
+    const listToFilter = selectedGeneration !== "" && generationPokemonList 
+      ? generationPokemonList 
+      : initialPokemonList;
+
     if (event.target.value === "") {
       // Show all Pokemon when "All Types" is selected
-      setPokemonListFiltered(initialPokemonList);
+      setPokemonListFiltered(listToFilter);
     } else {
-      setPokemonListFiltered(initialPokemonList.filter(
+      setPokemonListFiltered(listToFilter.filter(
         (pokemon) => pokemon.types.some((type) => type.id === parseInt(event.target.value))
       ));
     }
