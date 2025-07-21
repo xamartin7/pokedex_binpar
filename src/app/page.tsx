@@ -13,6 +13,8 @@ export default function Home() {
   const { data: types, isLoading: typesLoading } = api.pokemon.getTypes.useQuery({ generationId: DEFAULT_GENERATION_ID });
   const { data: pokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery({ generationId: DEFAULT_GENERATION_ID });
 
+  console.log('pokemonList', pokemonList);
+
   const isLoading = pokemonLoading || generationsLoading || typesLoading;
 
   if (isLoading) {

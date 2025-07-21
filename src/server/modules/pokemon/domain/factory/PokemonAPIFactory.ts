@@ -13,8 +13,6 @@ export class PokemonAPIFactory implements IPokemonFactory {
     async createPokemon(pokemonId: number): Promise<Pokemon> {
         const pokemonDetails = await this.pokeApiRepository.getPokemonDetails(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
         const pokemonSpecies = await this.pokeApiRepository.getPokemonSpecies(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`)
-        
-        // TODO Evolution chain
 
         const pokemon: Pokemon = {
             id: pokemonId,
@@ -30,7 +28,8 @@ export class PokemonAPIFactory implements IPokemonFactory {
                 name: pokemonSpecies.generation.name,
                 url: pokemonSpecies.generation.url
             },
-            evolutionChain: []
+            evolutionChain: [],
+            evolutionChainUrl: pokemonSpecies.evolution_chain.url
         }
 
         return pokemon
