@@ -25,7 +25,7 @@ export function PokemonList({initialData}: PokemonListProps) {
     <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Filters */}
-        <Filters generations={generations} types={types} pokemonList={pokemonList} setPokemonList={setPokemonListFiltered} />
+        <Filters generations={generations} types={types} setPokemonListFiltered={setPokemonListFiltered} initialPokemonList={pokemonList} />
 
         {/* Pagination Section */}
         <div className="mb-6">

@@ -8,11 +8,11 @@ import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 interface FiltersProps {
     generations: Generation[];
     types: Type[];
-    pokemonList: Pokemon[];
-    setPokemonList: (pokemonList: Pokemon[]) => void;
+    setPokemonListFiltered: (pokemonList: Pokemon[]) => void;
+    initialPokemonList: Pokemon[];
 }
 
-export function Filters({generations, types, pokemonList, setPokemonList}: FiltersProps) {
+export function Filters({generations, types, setPokemonListFiltered, initialPokemonList}: FiltersProps) {
   const [selectedGeneration, setSelectedGeneration] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
@@ -26,9 +26,11 @@ export function Filters({generations, types, pokemonList, setPokemonList}: Filte
     setSelectedType(event.target.value);
     if (event.target.value === "") {
       // Show all Pokemon when "All Types" is selected
-      setPokemonList(pokemonList);
+      setPokemonListFiltered(initialPokemonList);
     } else {
-      setPokemonList(pokemonList.filter((pokemon) => pokemon.types.some((type) => type.toLowerCase() === event.target.value.toLowerCase())));
+      setPokemonListFiltered(initialPokemonList.filter(
+        (pokemon) => pokemon.types.some((type) => type.toLowerCase() === event.target.value.toLowerCase()))
+      );
     }
   };
 
@@ -73,7 +75,7 @@ export function Filters({generations, types, pokemonList, setPokemonList}: Filte
           >
             <option key="all-types" value="">All Types</option>
             {types.map((type) => (
-              <option key={`type-${type.id}`} value={type.id.toString()}>
+              <option key={`type-${type.id}`} value={type.name}>
                 {type.name}
               </option>
             ))}
