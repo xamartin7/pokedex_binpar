@@ -7,13 +7,13 @@ const INITIAL_PAGE_SIZE = 12;
 
 interface PaginationSectionProps {
   pokemonList: Pokemon[];
-  onPaginationChange: (currentPage: number, pageSize: number) => void;
+  onPaginatedDataChange: (paginatedData: Pokemon[]) => void;
   initialPageSize?: number;
 }
 
 export function PaginationSection({
   pokemonList,
-  onPaginationChange,
+  onPaginatedDataChange,
   initialPageSize = INITIAL_PAGE_SIZE,
 }: PaginationSectionProps) {
   const [currentPage, setCurrentPage] = useState(INITIAL_CURRENT_PAGE);
@@ -21,10 +21,18 @@ export function PaginationSection({
 
   const totalPages = Math.ceil(pokemonList.length / pageSize);
 
-  // Notify parent component when pagination changes
+  // Reset to first page when pokemon list changes (e.g., when filters are applied)
   useEffect(() => {
-    onPaginationChange(currentPage, pageSize);
-  }, [currentPage, pageSize, onPaginationChange]);
+    setCurrentPage(INITIAL_CURRENT_PAGE);
+  }, [pokemonList]);
+
+  // Calculate paginated data and notify parent component
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedData = pokemonList.slice(startIndex, endIndex);
+    onPaginatedDataChange(paginatedData);
+  }, [currentPage, pageSize, pokemonList, onPaginatedDataChange]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -56,6 +64,8 @@ export function PaginationSection({
     
     return range;
   };
+  
+
   const startIndex = (currentPage - 1) * pageSize + 1;
   const endIndex = Math.min(currentPage * pageSize, pokemonList.length);
   const totalItems = pokemonList.length;
