@@ -2,6 +2,8 @@ import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 import { useState, useEffect } from "react";
 
 const PAGE_SIZE_OPTIONS = [6, 12, 18, 24, 30];
+const INITIAL_CURRENT_PAGE = 1;
+const INITIAL_PAGE_SIZE = 12;
 
 interface PaginationSectionProps {
   pokemonList: Pokemon[];
@@ -12,9 +14,9 @@ interface PaginationSectionProps {
 export function PaginationSection({
   pokemonList,
   onPaginationChange,
-  initialPageSize = 12,
+  initialPageSize = INITIAL_PAGE_SIZE,
 }: PaginationSectionProps) {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(INITIAL_CURRENT_PAGE);
   const [pageSize, setPageSize] = useState(initialPageSize);
 
   const totalPages = Math.ceil(pokemonList.length / pageSize);
