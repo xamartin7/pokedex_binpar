@@ -8,4 +8,5 @@ export interface Pokemon {
   types: Type[];
   generation: Generation;
   evolutionChain: Pokemon[];
+  evolutionChainUrl: string;
 }

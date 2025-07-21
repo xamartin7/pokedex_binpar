@@ -42,14 +42,17 @@ export interface PokemonDetailsResponse {
 }
 
 export interface PokemonEvolutionChainResponse {
-    chain: {
-        evolves_to: {
-            species: {
-                name: string
-                url: string
-            }
-        }[]
+    id: number
+    chain: ChainLink
+}
+
+export interface ChainLink {
+    is_baby: boolean
+    species: {
+        name: string
+        url: string
     }
+    evolves_to: ChainLink[]
 }
 
 export interface IPokeApiRepository {
