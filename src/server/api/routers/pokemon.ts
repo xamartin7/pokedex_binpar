@@ -6,7 +6,6 @@ import { PokemonAPIFactory } from "@/server/modules/pokemon/domain/factory/Pokem
 import { PokeApiRepository } from "@/server/modules/pokemon/infrastructure/repositories/PokeApiRepository"
 import { GetGenerationsUseCase } from "@/server/modules/generations/application/use-cases/GetGenerationsUseCase"
 import { GetTypesUseCase } from "@/server/modules/types/application/use-cases/GetTypesUseCase"
-import { EvolutionChainGenerator } from "@/server/modules/pokemon/domain/factory/EvolutionChainGenerator"
 import { GetPokemonDetailsUseCase } from "@/server/modules/pokemon/application/use-cases/GetPokemonDetailsUseCase"
 
 const pokemonFactory = new PokemonAPIFactory(new PokeApiRepository())
@@ -14,7 +13,7 @@ const getPokemonListUseCase = new GetPokemonListUseCase(new ListsGeneratorFacade
 const getGenerationsUseCase = new GetGenerationsUseCase(new PokeApiRepository())
 const getTypesUseCase = new GetTypesUseCase(new PokeApiRepository())
 
-const getPokemonDetailsUseCase = new GetPokemonDetailsUseCase(pokemonFactory, new EvolutionChainGenerator(pokemonFactory, new PokeApiRepository()))
+const getPokemonDetailsUseCase = new GetPokemonDetailsUseCase(new ListsGeneratorFacade(pokemonFactory, new PokeApiRepository()))
 
 
 export const pokemonRouter = createTRPCRouter({

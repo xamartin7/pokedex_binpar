@@ -1,21 +1,16 @@
 import type { Pokemon } from "../../domain/entities/Pokemon";
-import type { EvolutionChainGenerator } from "../../domain/factory/EvolutionChainGenerator";
-import type { IPokemonFactory } from "../../domain/factory/IPokemonFactory";
+import type { IListGeneratorFacade } from "../../domain/factory/IListGeneratorFacade";
 import type { IGetPokemonDetailsUseCase } from "../interfaces/IGetPokemonDetailsUseCase";
 
 export class GetPokemonDetailsUseCase implements IGetPokemonDetailsUseCase {
-    private pokemonFactory: IPokemonFactory
-    private evolutionChainGenerator: EvolutionChainGenerator
+    private listGeneratorFacade: IListGeneratorFacade
 
-    constructor(pokemonFactory: IPokemonFactory, evolutionChainGenerator: EvolutionChainGenerator) {
-        this.pokemonFactory = pokemonFactory
-        this.evolutionChainGenerator = evolutionChainGenerator
+    constructor(listGeneratorFacade: IListGeneratorFacade) {
+        this.listGeneratorFacade = listGeneratorFacade
     }
 
     async execute(id: number): Promise<Pokemon> {
-        const pokemon = await this.pokemonFactory.createPokemon(id)
-        const evolutionChain = await this.evolutionChainGenerator.generateEvolutionChain(pokemon.evolutionChainUrl)
-        pokemon.evolutionChain = evolutionChain
+        const pokemon = await this.listGeneratorFacade.getPokemonDetails(id)
         return pokemon
     }
 }

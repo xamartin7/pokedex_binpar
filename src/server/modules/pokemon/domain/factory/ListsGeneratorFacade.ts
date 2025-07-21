@@ -28,4 +28,11 @@ export class ListsGeneratorFacade implements IListGeneratorFacade {
         pokemons.sort((a, b) => a.id - b.id)
         return pokemons
     }
+
+    async getPokemonDetails(id: number): Promise<Pokemon> {
+        const pokemon = await this.pokemonFactory.createPokemon(id)
+        const evolutionChain = await this.evolutionChainGenerator.generateEvolutionChain(pokemon.evolutionChainUrl)
+        pokemon.evolutionChain = evolutionChain
+        return pokemon
+    }
 }
