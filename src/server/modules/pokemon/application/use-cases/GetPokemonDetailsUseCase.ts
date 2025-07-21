@@ -1,16 +1,16 @@
 import type { Pokemon } from "../../domain/entities/Pokemon";
-import type { IListGeneratorFacade } from "../../domain/factory/IListGeneratorFacade";
+import type { IPokemonsDataGeneratorFacade } from "../../domain/factory/IPokemonsDataGeneratorFacade";
 import type { IGetPokemonDetailsUseCase } from "../interfaces/IGetPokemonDetailsUseCase";
 
 export class GetPokemonDetailsUseCase implements IGetPokemonDetailsUseCase {
-    private listGeneratorFacade: IListGeneratorFacade
+    private pokemonDataGeneratorFacade: IPokemonsDataGeneratorFacade
 
-    constructor(listGeneratorFacade: IListGeneratorFacade) {
-        this.listGeneratorFacade = listGeneratorFacade
+    constructor(pokemonDataGeneratorFacade: IPokemonsDataGeneratorFacade) {
+        this.pokemonDataGeneratorFacade = pokemonDataGeneratorFacade
     }
 
     async execute(id: number): Promise<Pokemon> {
-        const pokemon = await this.listGeneratorFacade.getPokemonDetails(id)
+        const pokemon = await this.pokemonDataGeneratorFacade.getPokemonDetails(id)
         return pokemon
     }
 }

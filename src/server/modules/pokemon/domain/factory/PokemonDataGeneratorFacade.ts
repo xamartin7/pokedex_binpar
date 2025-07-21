@@ -1,10 +1,10 @@
 import type { IPokeApiRepository } from "../../infrastructure/interfaces/IPokeApiRepository";
 import type { Pokemon } from "../entities/Pokemon";
 import { EvolutionChainGenerator } from "./EvolutionChainGenerator";
-import type { IListGeneratorFacade } from "./IListGeneratorFacade";
+import type { IPokemonsDataGeneratorFacade } from "./IPokemonsDataGeneratorFacade";
 import type { IPokemonFactory } from "./IPokemonFactory";
 
-export class ListsGeneratorFacade implements IListGeneratorFacade {
+export class PokemonDataGeneratorFacade implements IPokemonsDataGeneratorFacade {
     private pokemonFactory: IPokemonFactory
     private pokeApiRepository: IPokeApiRepository
     private evolutionChainGenerator: EvolutionChainGenerator

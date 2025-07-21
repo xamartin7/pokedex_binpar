@@ -1,7 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "../trpc"
 import { z } from "zod"
 import { GetPokemonListUseCase } from "@/server/modules/pokemon/application/use-cases/getPokemonListUseCase"
-import { ListsGeneratorFacade } from "@/server/modules/pokemon/domain/factory/ListsGeneratorFacade"
+import { PokemonDataGeneratorFacade } from "@/server/modules/pokemon/domain/factory/PokemonDataGeneratorFacade"
 import { PokemonAPIFactory } from "@/server/modules/pokemon/domain/factory/PokemonAPIFactory"
 import { PokeApiRepository } from "@/server/modules/pokemon/infrastructure/repositories/PokeApiRepository"
 import { GetGenerationsUseCase } from "@/server/modules/generations/application/use-cases/GetGenerationsUseCase"
@@ -9,11 +9,11 @@ import { GetTypesUseCase } from "@/server/modules/types/application/use-cases/Ge
 import { GetPokemonDetailsUseCase } from "@/server/modules/pokemon/application/use-cases/GetPokemonDetailsUseCase"
 
 const pokemonFactory = new PokemonAPIFactory(new PokeApiRepository())
-const getPokemonListUseCase = new GetPokemonListUseCase(new ListsGeneratorFacade(pokemonFactory, new PokeApiRepository()))
+const getPokemonListUseCase = new GetPokemonListUseCase(new PokemonDataGeneratorFacade(pokemonFactory, new PokeApiRepository()))
 const getGenerationsUseCase = new GetGenerationsUseCase(new PokeApiRepository())
 const getTypesUseCase = new GetTypesUseCase(new PokeApiRepository())
 
-const getPokemonDetailsUseCase = new GetPokemonDetailsUseCase(new ListsGeneratorFacade(pokemonFactory, new PokeApiRepository()))
+const getPokemonDetailsUseCase = new GetPokemonDetailsUseCase(new PokemonDataGeneratorFacade(pokemonFactory, new PokeApiRepository()))
 
 
 export const pokemonRouter = createTRPCRouter({
