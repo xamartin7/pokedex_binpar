@@ -29,7 +29,15 @@ export class PokemonAPIFactory implements IPokemonFactory {
                 url: pokemonSpecies.generation.url
             },
             evolutionChain: [],
-            evolutionChainUrl: pokemonSpecies.evolution_chain.url
+            evolutionChainUrl: pokemonSpecies.evolution_chain.url,
+            stats: pokemonDetails.stats.map((stat) => ({
+                base_stat: stat.base_stat,
+                effort: stat.effort,
+                stat: {
+                    name: stat.stat.name,
+                    url: stat.stat.url
+                }
+            }))
         }
 
         return pokemon
