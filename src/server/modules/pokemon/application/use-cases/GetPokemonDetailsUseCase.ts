@@ -14,8 +14,8 @@ export class GetPokemonDetailsUseCase implements IGetPokemonDetailsUseCase {
         return pokemon
     }
 
-    async executeByName(name: string): Promise<Pokemon> {
-        const pokemon = await this.pokemonDataGeneratorFacade.getPokemonDetailsByName(name)
-        return pokemon
+    async executeByName(name: string): Promise<Pokemon[]> {
+        const pokemons = await this.pokemonDataGeneratorFacade.getPokemonsDetailsByName(name)
+        return pokemons
     }
 }

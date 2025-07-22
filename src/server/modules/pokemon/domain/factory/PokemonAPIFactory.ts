@@ -21,7 +21,7 @@ export class PokemonAPIFactory implements IPokemonFactory {
 
     async createPokemonByName(pokemonName: string): Promise<Pokemon> {
         try {
-            return this.buildPokemon(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`, `https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`)
+            return this.buildPokemon(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`,`https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`)
         } catch (error) {
             console.error('Error creating pokemon by name:', error)
             throw error
@@ -32,6 +32,8 @@ export class PokemonAPIFactory implements IPokemonFactory {
         try {
             const pokemonDetails = await this.pokeApiRepository.getPokemonDetails(detailsUrl)
             const pokemonSpecies = await this.pokeApiRepository.getPokemonSpecies(speciesUrl)
+            console.log('Pokemon details', pokemonDetails)
+            console.log('Pokemon species', pokemonSpecies)
             const pokemon: Pokemon = {
                 id: Number(pokemonDetails.id),
                 name: pokemonDetails.name,

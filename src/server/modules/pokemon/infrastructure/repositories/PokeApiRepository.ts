@@ -1,10 +1,13 @@
-import type { IPokeApiRepository, OneGenerationResponse, PokemonSpeciesResponse, GenerationsResponse, PokemonEvolutionChainResponse, PokemonDetailsResponse } from "../interfaces/IPokeApiRepository";
+import type { IPokeApiRepository, OneGenerationResponse, PokemonSpeciesResponse, GenerationsResponse, PokemonEvolutionChainResponse, PokemonDetailsResponse, AllPokemonsResponse } from "../interfaces/IPokeApiRepository";
+
+const POKEMON_API_URL = 'https://pokeapi.co/api/v2'
+const LIMIT_POKEMONS = 1025
 
 export class PokeApiRepository implements IPokeApiRepository {
 
     async getGenerations(): Promise<GenerationsResponse> {
         try {
-            const response = await this.fetchWithRetry('https://pokeapi.co/api/v2/generation');
+            const response = await this.fetchWithRetry(`${POKEMON_API_URL}/generation`);
             return response.json() as Promise<GenerationsResponse>;
         } catch (error) {
             console.error('Error fetching generations:', error);
@@ -52,12 +55,22 @@ export class PokeApiRepository implements IPokeApiRepository {
         }
     }
 
+    async getAllPokemons(): Promise<AllPokemonsResponse> {
+        try {
+            const response = await this.fetchWithRetry(`${POKEMON_API_URL}/pokemon?limit=${LIMIT_POKEMONS}`);
+            return response.json() as Promise<AllPokemonsResponse>;
+        } catch (error) {
+            console.error('Error fetching all pokemons:', error);
+            throw error;
+        }
+    }
+
     private async fetchWithRetry(url: string, maxRetries = 3, delayMs = 2000): Promise<Response> {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 const response = await fetch(url);
                 if (response.status === 404) {
-                    throw new Error('Pokemon not found');
+                    return response;
                 }
                 
                 if (response.status === 429) {

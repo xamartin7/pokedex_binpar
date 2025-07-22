@@ -74,7 +74,7 @@ export function Filters({
   useEffect(() => {
     if (globalPokemonResult) {
       // Add the globally found Pokemon to the filtered list
-      setPokemonListFiltered([globalPokemonResult]);
+      setPokemonListFiltered(globalPokemonResult);
     }
   }, [globalPokemonResult, setPokemonListFiltered]);
 
@@ -305,6 +305,12 @@ export function Filters({
                 <p className="text-sm text-red-600 mt-1">
                   {getErrorMessage()}
                 </p>
+                <button
+                  onClick={handleGlobalSearch}
+                  className="mt-2 px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
+                >
+                  Try again
+                </button>
               </div>
             </div>
           </div>
