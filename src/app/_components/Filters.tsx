@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import type { Generation } from "@/server/modules/generations/domain/entities/Generation";
 import type { Type } from "@/server/modules/types/domain/entities/Type";
 import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 import { api } from "@/trpc/react";
+import { useFilters } from "@/contexts/FilterContext";
 
 interface FiltersProps {
     generations: Generation[];
@@ -16,9 +17,12 @@ interface FiltersProps {
 }
 
 export function Filters({generations, types, setPokemonListFiltered, initialPokemonList, filteredPokemonList, setInitialPokemonList}: FiltersProps) {
-  const [selectedGeneration, setSelectedGeneration] = useState<string>("");
-  const [selectedType, setSelectedType] = useState<string>("");
-  const [searchText, setSearchText] = useState<string>("");
+  const { 
+    filters: { selectedGeneration, selectedType, searchText },
+    setSelectedGeneration,
+    setSelectedType,
+    setSearchText
+  } = useFilters();
 
   // Move the useQuery hook to the top level
   const { data: generationPokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery(
@@ -27,16 +31,14 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
       enabled: selectedGeneration !== "",
       staleTime: 60 * 60 * 1000, // 1 hour cache
       gcTime: 60 * 60 * 1000, // 1 hour cache
-    } // Only run query when generation is selected
+    }
   );
 
   // Update filtered list when generation data changes
   useEffect(() => {
     if (selectedGeneration === "") {
-      // If no generation selected, use initial list
       setInitialPokemonList(initialPokemonList);
     } else if (generationPokemonList) {
-      // If generation selected and data is available, use generation data
       setInitialPokemonList(generationPokemonList);
       setPokemonListFiltered(generationPokemonList);
     }
@@ -44,8 +46,6 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
 
   const handleGenerationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedGeneration(event.target.value);
-    // Reset type filter when generation changes
-    setSelectedType("");
   };
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -57,7 +57,6 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
       : initialPokemonList;
 
     if (event.target.value === "") {
-      // Show all Pokemon when "All Types" is selected
       setPokemonListFiltered(listToFilter);
     } else {
       setPokemonListFiltered(listToFilter.filter(
@@ -71,7 +70,6 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
     const searchTerm = event.target.value.toLowerCase();
     
     if (searchTerm === "") {
-      // If search is empty, show all Pokemon
       setPokemonListFiltered(initialPokemonList);
       return;
     }
@@ -85,7 +83,6 @@ export function Filters({generations, types, setPokemonListFiltered, initialPoke
     // Get all evolution chains from matching Pokemon
     const allEvolutionPokemon: Pokemon[] = [];
     matchingPokemon.forEach((pokemon) => {
-      // Add all Pokemon from the evolution chain
       allEvolutionPokemon.push(...pokemon.evolutionChain);
     });
 

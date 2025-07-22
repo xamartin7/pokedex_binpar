@@ -4,6 +4,7 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
+import { FilterProvider } from "@/contexts/FilterContext";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -18,11 +19,17 @@ const geist = Geist({
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${geist.variable}`}>
-      <body className="bg-gray-100 text-black">
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+    <html lang="en">
+      <body className={`font-sans ${geist.variable}`}>
+        <TRPCReactProvider>
+          <FilterProvider>
+            {children}
+          </FilterProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   );
