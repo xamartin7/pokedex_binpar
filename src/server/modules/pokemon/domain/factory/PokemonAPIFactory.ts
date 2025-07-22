@@ -32,8 +32,6 @@ export class PokemonAPIFactory implements IPokemonFactory {
         try {
             const pokemonDetails = await this.pokeApiRepository.getPokemonDetails(detailsUrl)
             const pokemonSpecies = await this.pokeApiRepository.getPokemonSpecies(speciesUrl)
-            console.log('Pokemon details', pokemonDetails)
-            console.log('Pokemon species', pokemonSpecies)
             const pokemon: Pokemon = {
                 id: Number(pokemonDetails.id),
                 name: pokemonDetails.name,
