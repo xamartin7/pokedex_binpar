@@ -29,6 +29,7 @@ export interface PokemonSpeciesResponse {
 }
 
 export interface PokemonDetailsResponse {
+    id: number
     name: string
     sprites: {
         front_default: string
@@ -63,10 +64,19 @@ export interface ChainLink {
     evolves_to: ChainLink[]
 }
 
+export interface AllPokemonsResponse {
+    count: number
+    results: {
+        name: string
+        url: string
+    }[]
+}
+
 export interface IPokeApiRepository {
     getGenerations(): Promise<GenerationsResponse>;
     getOneGeneration(url: string): Promise<OneGenerationResponse>;
     getPokemonSpecies(url: string): Promise<PokemonSpeciesResponse>;
     getPokemonEvolutionChain(url: string): Promise<PokemonEvolutionChainResponse>;
     getPokemonDetails(url: string): Promise<PokemonDetailsResponse>;
+    getAllPokemons(): Promise<AllPokemonsResponse>;
 }

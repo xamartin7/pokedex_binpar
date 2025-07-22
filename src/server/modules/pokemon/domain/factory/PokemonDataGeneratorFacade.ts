@@ -3,6 +3,7 @@ import type { Pokemon } from "../entities/Pokemon";
 import { EvolutionChainGenerator } from "./EvolutionChainGenerator";
 import type { IPokemonsDataGeneratorFacade } from "./IPokemonsDataGeneratorFacade";
 import type { IPokemonFactory } from "./IPokemonFactory";
+import { IdsUrlExtractor } from "../services/IdsUrlExtractor";
 
 export class PokemonDataGeneratorFacade implements IPokemonsDataGeneratorFacade {
     private pokemonFactory: IPokemonFactory
@@ -34,5 +35,21 @@ export class PokemonDataGeneratorFacade implements IPokemonsDataGeneratorFacade 
         const evolutionChain = await this.evolutionChainGenerator.generateEvolutionChain(pokemon.evolutionChainUrl)
         pokemon.evolutionChain = evolutionChain
         return pokemon
+    }
+
+    async getPokemonsDetailsByName(name: string): Promise<Pokemon[]> {
+        const allPokemons = await this.pokeApiRepository.getAllPokemons()
+        const pokemonsMatch = allPokemons.results.filter((pokemon) => pokemon.name.includes(name))
+        const pokemonsIds = pokemonsMatch
+            .map((pokemon) => IdsUrlExtractor.extractIdFromUrl(pokemon.url))
+            .filter((id): id is number => id !== null)
+
+        const pokemons = await Promise.all(pokemonsIds.map(async (id) => {
+            const pokemon = await this.pokemonFactory.createPokemon(id)
+            const evolutionChain = await this.evolutionChainGenerator.generateEvolutionChain(pokemon.evolutionChainUrl)
+            pokemon.evolutionChain = evolutionChain
+            return pokemon
+        }))
+        return pokemons
     }
 }
