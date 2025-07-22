@@ -1,12 +1,14 @@
 import { api } from "@/trpc/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Type } from "@/server/modules/types/domain/entities/Type";
 import StatBar from "../_components/details/StatBar";
 import { EvolutionChain } from "../_components/details/EvolutionChain";
 
 interface PageProps {
   params: { id: string };
+  searchParams: { originId?: string };
 }
 
 function TypeBadge({ type }: { type: Type }) {
@@ -43,9 +45,9 @@ function TypeBadge({ type }: { type: Type }) {
   );
 }
 
-
-export default async function PokemonDetailPage({ params }: PageProps) {
+export default async function PokemonDetailPage({ params, searchParams }: PageProps) {
   const { id } = params;
+  const { originId } = searchParams;
   const pokemonId = Number(id);
 
   if (isNaN(pokemonId)) {
@@ -59,8 +61,65 @@ export default async function PokemonDetailPage({ params }: PageProps) {
       notFound();
     }
 
+    // Fetch origin Pokemon details if originId exists and is different from current
+    let originPokemon = null;
+    const originPokemonId = originId ? Number(originId) : null;
+    
+    if (originPokemonId && !isNaN(originPokemonId) && originPokemonId !== pokemonId) {
+      try {
+        originPokemon = await api.pokemon.getPokemonDetails({ id: originPokemonId });
+      } catch (error) {
+        console.error('Error fetching origin Pokemon:', error);
+      }
+    }
+
     return (
       <div className="space-y-8">
+        {/* Back to Origin Navigation */}
+        {originPokemon && (
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <Link 
+                href={`/${originPokemon.id}`}
+                className="flex items-center text-blue-600 hover:text-blue-800 transition-colors group"
+              >
+                <svg 
+                  className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M15 19l-7-7 7-7" 
+                  />
+                </svg>
+                <div className="flex items-center">
+                  <div className="relative w-10 h-10 mr-3">
+                    <Image
+                      src={originPokemon.image}
+                      alt={originPokemon.name}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                  <div>
+                    <span className="font-medium text-sm text-gray-600">Back to origin</span>
+                    <p className="font-bold text-lg capitalize">
+                      {originPokemon.name} (#{originPokemon.id})
+                    </p>
+                  </div>
+                </div>
+              </Link>
+              <div className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">
+                🏠 Origin
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Main Pokemon Info */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
@@ -117,7 +176,11 @@ export default async function PokemonDetailPage({ params }: PageProps) {
         </div>
 
         {/* Evolution Chain */}
-        <EvolutionChain evolutionChain={pokemonDetails.evolutionChain} />
+        <EvolutionChain 
+          evolutionChain={pokemonDetails.evolutionChain} 
+          currentPokemonId={pokemonId}
+          originId={originPokemonId ?? undefined}
+        />
       </div>
     );
   } catch (error) {
