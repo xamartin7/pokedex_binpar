@@ -69,9 +69,6 @@ export class PokeApiRepository implements IPokeApiRepository {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 const response = await fetch(url);
-                if (response.status === 404) {
-                    return response;
-                }
                 
                 if (response.status === 429) {
                     if (attempt === maxRetries) {

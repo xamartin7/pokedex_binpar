@@ -7,6 +7,7 @@ import { PokeApiRepository } from "@/server/modules/pokemon/infrastructure/repos
 import { GetGenerationsUseCase } from "@/server/modules/generations/application/use-cases/GetGenerationsUseCase"
 import { GetTypesUseCase } from "@/server/modules/types/application/use-cases/GetTypesUseCase"
 import { GetPokemonDetailsUseCase } from "@/server/modules/pokemon/application/use-cases/GetPokemonDetailsUseCase"
+import { TRPCError } from "@trpc/server"
 
 const pokemonFactory = new PokemonAPIFactory(new PokeApiRepository())
 const getPokemonListUseCase = new GetPokemonListUseCase(new PokemonDataGeneratorFacade(pokemonFactory, new PokeApiRepository()))
@@ -55,8 +56,11 @@ export const pokemonRouter = createTRPCRouter({
     }),
     getPokemonDetailsByName: publicProcedure.input(z.object({ name: z.string() })).query(async ({ input }) => {
       try {
-        const pokemonDetails = await getPokemonDetailsUseCase.executeByName(input.name)
-        return pokemonDetails
+        const pokemonsDetails = await getPokemonDetailsUseCase.executeByName(input.name)
+        if (pokemonsDetails.length === 0) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Pokemon not found' })
+        }
+        return pokemonsDetails
       } catch (error) {
         console.error('Error getting pokemon details by name:', error)
         throw error
