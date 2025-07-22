@@ -67,38 +67,58 @@ export function Filters({
     }
   }, [initialPokemonList.length]); // Only run when initialPokemonList is first populated
 
+  // Pure function to apply type filter
+  const applyTypeFilter = (pokemonList: Pokemon[], typeId: string): Pokemon[] => {
+    if (typeId === "") {
+      return pokemonList;
+    }
+    return pokemonList.filter(
+      (pokemon) => pokemon.types.some((type) => type.id === parseInt(typeId))
+    );
+  };
+
+  // Pure function to apply search filter (includes evolution chains)
+  const applySearchFilter = (pokemonList: Pokemon[], searchTerm: string): Pokemon[] => {
+    if (searchTerm === "") {
+      return pokemonList;
+    }
+    
+    const searchTermLower = searchTerm.toLowerCase();
+    
+    // Find Pokemon that match the search term
+    const matchingPokemon = pokemonList.filter((pokemon) => {
+      return pokemon.name.toLowerCase().includes(searchTermLower);
+    });
+
+    // Get all evolution chains from matching Pokemon
+    const allEvolutionPokemon: Pokemon[] = [];
+    matchingPokemon.forEach((pokemon) => {
+      allEvolutionPokemon.push(...pokemon.evolutionChain);
+    });
+
+    // Remove duplicates based on Pokemon name
+    return allEvolutionPokemon.filter((pokemon, index, self) => 
+      index === self.findIndex((p) => p.name === pokemon.name)
+    );
+  };
+
   const applyCurrentFilters = () => {
+    applyAllFilters();
+  };
+
+  // Common function to apply all filters with optional overrides
+  const applyAllFilters = (typeOverride?: string, searchOverride?: string) => {
     let listToFilter = selectedGeneration !== "" && generationPokemonList 
       ? generationPokemonList 
       : initialPokemonList;
 
-    // Apply type filter first
-    if (selectedType !== "") {
-      listToFilter = listToFilter.filter(
-        (pokemon) => pokemon.types.some((type) => type.id === parseInt(selectedType))
-      );
-    }
-
-    // Then apply search filter
-    if (searchText !== "") {
-      const searchTerm = searchText.toLowerCase();
-      
-      // Find Pokemon that match the search term
-      const matchingPokemon = listToFilter.filter((pokemon) => {
-        return pokemon.name.toLowerCase().includes(searchTerm);
-      });
-
-      // Get all evolution chains from matching Pokemon
-      const allEvolutionPokemon: Pokemon[] = [];
-      matchingPokemon.forEach((pokemon) => {
-        allEvolutionPokemon.push(...pokemon.evolutionChain);
-      });
-
-      // Remove duplicates based on Pokemon name
-      listToFilter = allEvolutionPokemon.filter((pokemon, index, self) => 
-        index === self.findIndex((p) => p.name === pokemon.name)
-      );
-    }
+    // Apply type filter (use override if provided, otherwise current state)
+    const typeToUse = typeOverride ?? selectedType;
+    listToFilter = applyTypeFilter(listToFilter, typeToUse);
+    
+    // Apply search filter (use override if provided, otherwise current state)
+    const searchToUse = searchOverride ?? searchText;
+    listToFilter = applySearchFilter(listToFilter, searchToUse);
 
     setPokemonListFiltered(listToFilter);
   };
@@ -111,67 +131,12 @@ export function Filters({
 
   const handleTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedType(event.target.value);
-    
-    // Determine which list to filter based on current state
-    const listToFilter = selectedGeneration !== "" && generationPokemonList 
-      ? generationPokemonList 
-      : initialPokemonList;
-
-    if (event.target.value === "") {
-      // Show all Pokemon when "All Types" is selected
-      setPokemonListFiltered(listToFilter);
-    } else {
-      setPokemonListFiltered(listToFilter.filter(
-        (pokemon) => pokemon.types.some((type) => type.id === parseInt(event.target.value))
-      ));
-    }
+    applyAllFilters(event.target.value);
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
-    const searchTerm = event.target.value.toLowerCase();
-    
-    if (searchTerm === "") {
-      // If search is empty, show all Pokemon (or apply type filter if active)
-      if (selectedType !== "") {
-        // Reapply type filter
-        const listToFilter = selectedGeneration !== "" && generationPokemonList 
-          ? generationPokemonList 
-          : initialPokemonList;
-        setPokemonListFiltered(listToFilter.filter(
-          (pokemon) => pokemon.types.some((type) => type.id === parseInt(selectedType))
-        ));
-      } else {
-        setPokemonListFiltered(initialPokemonList);
-      }
-      return;
-    }
-    
-    // Start with the current list (considering type filter)
-    let listToSearch = initialPokemonList;
-    if (selectedType !== "") {
-      listToSearch = initialPokemonList.filter(
-        (pokemon) => pokemon.types.some((type) => type.id === parseInt(selectedType))
-      );
-    }
-    
-    // Find Pokemon that match the search term
-    const matchingPokemon = listToSearch.filter((pokemon) => {
-      return pokemon.name.toLowerCase().includes(searchTerm);
-    });
-
-    // Get all evolution chains from matching Pokemon
-    const allEvolutionPokemon: Pokemon[] = [];
-    matchingPokemon.forEach((pokemon) => {
-      allEvolutionPokemon.push(...pokemon.evolutionChain);
-    });
-
-    // Remove duplicates based on Pokemon name
-    const uniqueEvolutionPokemon = allEvolutionPokemon.filter((pokemon, index, self) => 
-      index === self.findIndex((p) => p.name === pokemon.name)
-    );
-
-    setPokemonListFiltered(uniqueEvolutionPokemon);
+    applyAllFilters(undefined, event.target.value);
   };
 
   return (
