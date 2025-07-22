@@ -11,11 +11,19 @@ export class PokemonAPIFactory implements IPokemonFactory {
     }
 
     async createPokemon(pokemonId: number): Promise<Pokemon> {
-        const pokemonDetails = await this.pokeApiRepository.getPokemonDetails(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
-        const pokemonSpecies = await this.pokeApiRepository.getPokemonSpecies(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`)
+        return this.buildPokemon(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`, `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`)
+    }
+
+    async createPokemonByName(pokemonName: string): Promise<Pokemon> {
+        return this.buildPokemon(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`, `https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`)
+    }
+
+    private async buildPokemon(detailsUrl: string, speciesUrl: string): Promise<Pokemon> {
+        const pokemonDetails = await this.pokeApiRepository.getPokemonDetails(detailsUrl)
+        const pokemonSpecies = await this.pokeApiRepository.getPokemonSpecies(speciesUrl)
 
         const pokemon: Pokemon = {
-            id: pokemonId,
+            id: Number(pokemonDetails.id),
             name: pokemonDetails.name,
             image: pokemonDetails.sprites.front_default ?? '',
             types: pokemonDetails.types.map((type) => ({

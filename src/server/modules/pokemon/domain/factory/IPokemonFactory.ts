@@ -8,4 +8,5 @@ export interface IPokemonFactory {
      * @returns A pokemon object
      */
     createPokemon(pokemonId: number): Promise<Pokemon>;
+    createPokemonByName(pokemonName: string): Promise<Pokemon>;
 }

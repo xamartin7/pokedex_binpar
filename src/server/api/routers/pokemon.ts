@@ -32,5 +32,9 @@ export const pokemonRouter = createTRPCRouter({
     getPokemonDetails: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
       const pokemonDetails = await getPokemonDetailsUseCase.execute(input.id)
       return pokemonDetails
+    }),
+    getPokemonDetailsByName: publicProcedure.input(z.object({ name: z.string() })).query(async ({ input }) => {
+      const pokemonDetails = await getPokemonDetailsUseCase.executeByName(input.name)
+      return pokemonDetails
     })
   })

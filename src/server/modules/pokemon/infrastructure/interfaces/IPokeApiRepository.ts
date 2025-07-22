@@ -29,6 +29,7 @@ export interface PokemonSpeciesResponse {
 }
 
 export interface PokemonDetailsResponse {
+    id: number
     name: string
     sprites: {
         front_default: string

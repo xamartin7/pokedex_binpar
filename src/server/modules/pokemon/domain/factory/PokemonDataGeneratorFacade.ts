@@ -35,4 +35,11 @@ export class PokemonDataGeneratorFacade implements IPokemonsDataGeneratorFacade 
         pokemon.evolutionChain = evolutionChain
         return pokemon
     }
+
+    async getPokemonDetailsByName(name: string): Promise<Pokemon> {
+        const pokemon = await this.pokemonFactory.createPokemonByName(name)
+        const evolutionChain = await this.evolutionChainGenerator.generateEvolutionChain(pokemon.evolutionChainUrl)
+        pokemon.evolutionChain = evolutionChain
+        return pokemon
+    }
 }
