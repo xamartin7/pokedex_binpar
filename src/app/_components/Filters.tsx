@@ -45,6 +45,8 @@ export function Filters({
   const { 
     data: globalPokemonResult, 
     isLoading: globalSearchLoading,
+    error: globalSearchError,
+    isError: globalSearchIsError,
     refetch: searchGlobalPokemon 
   } = api.pokemon.getPokemonDetailsByName.useQuery(
     { name: searchText.toLowerCase().trim() },
@@ -52,6 +54,7 @@ export function Filters({
       enabled: false, // Only trigger manually
       staleTime: 60 * 60 * 1000, // 1 hour cache
       gcTime: 60 * 60 * 1000, // 1 hour cache
+      retry: false, // Don't retry on 404 errors
     }
   );
 
@@ -172,7 +175,27 @@ export function Filters({
     searchText.trim().length > 0 && 
     filteredPokemonList.length === 0 && 
     !pokemonLoading && 
+    !globalSearchLoading &&
+    !globalSearchIsError; // Don't show button if there's an error
+
+  // Check if we should show the error message
+  const shouldShowErrorMessage = 
+    globalSearchIsError && 
+    searchText.trim().length > 0 && 
     !globalSearchLoading;
+
+  // Get error message based on error type
+  const getErrorMessage = () => {
+    if (!globalSearchError) return "";
+    
+    // Check if it's a "NOT_FOUND" error
+    if (globalSearchError.data?.code === "NOT_FOUND") {
+      return `Pokemon "${searchText}" not found. Please check the spelling and try again.`;
+    }
+    
+    // Handle other types of errors
+    return `Error searching for Pokemon: ${globalSearchError.message}`;
+  };
 
   return (
     <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm relative">
@@ -254,15 +277,36 @@ export function Filters({
         {/* Global Search Button */}
         {shouldShowGlobalSearchButton && (
           <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                         <p className="text-sm text-blue-700 mb-2">
-               No results found in current selection. Search globally for &ldquo;{searchText}&rdquo;?
-             </p>
-             <button
-               onClick={handleGlobalSearch}
-               className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
-             >
-               Search globally for &ldquo;{searchText}&rdquo;
-             </button>
+            <p className="text-sm text-blue-700 mb-2">
+              No results found in current selection. Search globally for &ldquo;{searchText}&rdquo;?
+            </p>
+            <button
+              onClick={handleGlobalSearch}
+              className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+            >
+              Search globally for &ldquo;{searchText}&rdquo;
+            </button>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {shouldShowErrorMessage && (
+          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700 font-medium">
+                  Search Error
+                </p>
+                <p className="text-sm text-red-600 mt-1">
+                  {getErrorMessage()}
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>

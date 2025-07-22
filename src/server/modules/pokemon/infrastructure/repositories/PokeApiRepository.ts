@@ -56,6 +56,9 @@ export class PokeApiRepository implements IPokeApiRepository {
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 const response = await fetch(url);
+                if (response.status === 404) {
+                    throw new Error('Pokemon not found');
+                }
                 
                 if (response.status === 429) {
                     if (attempt === maxRetries) {

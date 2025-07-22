@@ -18,23 +18,48 @@ const getPokemonDetailsUseCase = new GetPokemonDetailsUseCase(new PokemonDataGen
 
 export const pokemonRouter = createTRPCRouter({
     getPokemonList: publicProcedure.input(z.object({ generationId: z.number() })).query(async ({ input }) => {
-      const pokemonList = await getPokemonListUseCase.getByGeneration(input.generationId) 
-      return pokemonList
+      try {
+        const pokemonList = await getPokemonListUseCase.getByGeneration(input.generationId) 
+        return pokemonList
+      } catch (error) {
+        console.error('Error getting pokemon list:', error)
+        throw error
+      }
     }),
     getGenerations: publicProcedure.query(async () => {
-      const generations = await getGenerationsUseCase.getGenerations()
-      return generations
+      try {
+        const generations = await getGenerationsUseCase.getGenerations()
+        return generations
+      } catch (error) {
+        console.error('Error getting generations:', error)
+        throw error
+      }
     }),
     getTypes: publicProcedure.input(z.object({ generationId: z.number() })).query(async ({ input }) => {
-      const types = await getTypesUseCase.getTypes(input.generationId)
-      return types
+      try {
+        const types = await getTypesUseCase.getTypes(input.generationId)
+        return types
+      } catch (error) {
+        console.error('Error getting types:', error)
+        throw error
+      }
     }),
     getPokemonDetails: publicProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
-      const pokemonDetails = await getPokemonDetailsUseCase.execute(input.id)
-      return pokemonDetails
+      try {
+        const pokemonDetails = await getPokemonDetailsUseCase.execute(input.id)
+        return pokemonDetails
+      } catch (error) {
+        console.error('Error getting pokemon details:', error)
+        throw error
+      }
     }),
     getPokemonDetailsByName: publicProcedure.input(z.object({ name: z.string() })).query(async ({ input }) => {
-      const pokemonDetails = await getPokemonDetailsUseCase.executeByName(input.name)
-      return pokemonDetails
+      try {
+        const pokemonDetails = await getPokemonDetailsUseCase.executeByName(input.name)
+        return pokemonDetails
+      } catch (error) {
+        console.error('Error getting pokemon details by name:', error)
+        throw error
+      }
     })
   })
