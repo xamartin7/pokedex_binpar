@@ -25,15 +25,15 @@ const typeColors: Record<string, string> = {
 
 export function PokemonCard({pokemon}: {pokemon: Pokemon}) {
   return (
-    <Link href={`/${pokemon.id}`} className="block">
-      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-200 cursor-pointer">
+    <Link href={`/${pokemon.id}`} className="block hover:scale-105 transition-transform duration-100">
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-100 overflow-hidden border border-gray-200 cursor-pointer">
         <div className="relative h-48 bg-gray-50 flex items-center justify-center">
           <Image 
             src={pokemon.image} 
             alt={pokemon.name} 
             width={120} 
             height={120}
-            className="object-contain hover:scale-110 transition-transform duration-300"
+            className="object-contain hover:scale-110 transition-transform duration-100"
           />
         </div>
         

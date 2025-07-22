@@ -45,10 +45,7 @@ export default function Home() {
 
   useEffect(() => {
     if (allDataLoaded) {
-      // Small delay to ensure smooth transition
-      //const timer = setTimeout(() => setShowContent(true), 100);
       setShowContent(true);
-      //return () => clearTimeout(timer);
     }
   }, [allDataLoaded]);
 
