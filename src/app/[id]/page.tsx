@@ -1,8 +1,9 @@
 import { api } from "@/trpc/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import type { Pokemon, PokemonStat } from "@/server/modules/pokemon/domain/entities/Pokemon";
 import type { Type } from "@/server/modules/types/domain/entities/Type";
+import StatBar from "../_components/details/StatBar";
+import { EvolutionChain } from "../_components/details/EvolutionChain";
 
 interface PageProps {
   params: { id: string };
@@ -42,81 +43,6 @@ function TypeBadge({ type }: { type: Type }) {
   );
 }
 
-function StatBar({ stat }: { stat: PokemonStat }) {
-  const getStatColor = (value: number) => {
-    if (value >= 100) return "bg-green-500";
-    if (value >= 80) return "bg-yellow-500";
-    if (value >= 60) return "bg-orange-500";
-    return "bg-red-500";
-  };
-
-  const maxStat = 200; // Maximum possible stat value for width calculation
-  const percentage = Math.min((stat.base_stat / maxStat) * 100, 100);
-
-  return (
-    <div className="flex items-center space-x-3">
-      <span className="w-20 text-sm font-medium text-gray-700 capitalize">
-        {stat.stat.name.replace('-', ' ')}
-      </span>
-      <div className="flex-1 bg-gray-200 rounded-full h-3">
-        <div 
-          className={`h-3 rounded-full transition-all duration-300 ${getStatColor(stat.base_stat)}`}
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
-      <span className="w-12 text-sm font-bold text-gray-800">
-        {stat.base_stat}
-      </span>
-    </div>
-  );
-}
-
-function EvolutionChain({ evolutionChain }: { evolutionChain: Pokemon[] }) {
-  if (!evolutionChain || evolutionChain.length <= 1) {
-    return null;
-  }
-
-  return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-xl font-bold text-gray-900 mb-4">Evolution Chain</h3>
-      <div className="flex items-center justify-center space-x-4 overflow-x-auto">
-        {evolutionChain.map((pokemon, index) => (
-          <div key={pokemon.id} className="flex items-center">
-            <div className="text-center flex-shrink-0">
-              <div className="relative w-20 h-20 mx-auto mb-2">
-                <Image
-                  src={pokemon.image}
-                  alt={pokemon.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <p className="text-sm font-medium text-gray-900 capitalize">
-                {pokemon.name}
-              </p>
-              <p className="text-xs text-gray-500">#{pokemon.id}</p>
-            </div>
-            {index < evolutionChain.length - 1 && (
-              <svg 
-                className="w-6 h-6 text-gray-400 mx-2 flex-shrink-0" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M9 5l7 7-7 7" 
-                />
-              </svg>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default async function PokemonDetailPage({ params }: PageProps) {
   const { id } = params;
