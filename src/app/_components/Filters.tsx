@@ -41,6 +41,20 @@ export function Filters({
     }
   );
 
+  // Global Pokemon search by name
+  const { 
+    data: globalPokemonResult, 
+    isLoading: globalSearchLoading,
+    refetch: searchGlobalPokemon 
+  } = api.pokemon.getPokemonDetailsByName.useQuery(
+    { name: searchText.toLowerCase().trim() },
+    { 
+      enabled: false, // Only trigger manually
+      staleTime: 60 * 60 * 1000, // 1 hour cache
+      gcTime: 60 * 60 * 1000, // 1 hour cache
+    }
+  );
+
   // Update filtered list when generation data changes
   useEffect(() => {
     if (selectedGeneration === "") {
@@ -52,6 +66,14 @@ export function Filters({
       setPokemonListFiltered(generationPokemonList);
     }
   }, [selectedGeneration, generationPokemonList, initialPokemonList, setInitialPokemonList, setPokemonListFiltered]);
+
+  // Handle global search result
+  useEffect(() => {
+    if (globalPokemonResult) {
+      // Add the globally found Pokemon to the filtered list
+      setPokemonListFiltered([globalPokemonResult]);
+    }
+  }, [globalPokemonResult, setPokemonListFiltered]);
 
   // Reapply filters when component mounts if there are active filter states
   useEffect(() => {
@@ -139,14 +161,29 @@ export function Filters({
     applyAllFilters(undefined, event.target.value);
   };
 
+  const handleGlobalSearch = () => {
+    if (searchText.trim()) {
+      void searchGlobalPokemon();
+    }
+  };
+
+  // Check if we should show the global search button
+  const shouldShowGlobalSearchButton = 
+    searchText.trim().length > 0 && 
+    filteredPokemonList.length === 0 && 
+    !pokemonLoading && 
+    !globalSearchLoading;
+
   return (
     <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm relative">
       {/* Loading Overlay */}
-      {pokemonLoading && (
+      {(pokemonLoading || globalSearchLoading) && (
         <div className="absolute inset-0 bg-gray-50/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
           <div className="flex flex-col items-center space-y-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <p className="text-sm text-gray-600 font-medium">Loading Pokemon...</p>
+            <p className="text-sm text-gray-600 font-medium">
+              {pokemonLoading ? "Loading Pokemon..." : "Searching globally..."}
+            </p>
           </div>
         </div>
       )}
@@ -164,7 +201,7 @@ export function Filters({
             value={selectedGeneration}
             onChange={handleGenerationChange}
             className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            disabled={pokemonLoading}
+            disabled={pokemonLoading || globalSearchLoading}
           >
             {generations.map((generation) => (
               <option key={`generation-${generation.id}`} value={generation.id.toString()}>
@@ -184,7 +221,7 @@ export function Filters({
             value={selectedType}
             onChange={handleTypeChange}
             className="px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            disabled={pokemonLoading}
+            disabled={pokemonLoading || globalSearchLoading}
           >
             <option key="all-types" value="">All Types</option>
             {types.map((type) => (
@@ -208,11 +245,26 @@ export function Filters({
           onChange={handleSearchChange}
           placeholder="Search by name or evolution..."
           className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          disabled={pokemonLoading}
+          disabled={pokemonLoading || globalSearchLoading}
         />
         <p className="mt-1 text-xs text-gray-500">
           Type to search Pokemon names and their evolutions in real time
         </p>
+        
+        {/* Global Search Button */}
+        {shouldShowGlobalSearchButton && (
+          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                         <p className="text-sm text-blue-700 mb-2">
+               No results found in current selection. Search globally for &ldquo;{searchText}&rdquo;?
+             </p>
+             <button
+               onClick={handleGlobalSearch}
+               className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+             >
+               Search globally for &ldquo;{searchText}&rdquo;
+             </button>
+          </div>
+        )}
       </div>
     </div>
   );
