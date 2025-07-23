@@ -1,40 +1,26 @@
 "use client";
 
 import { useEffect } from "react";
-import type { Generation } from "@/server/modules/generations/domain/entities/Generation";
-import type { Type } from "@/server/modules/types/domain/entities/Type";
-import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 import { api } from "@/trpc/react";
 import { useFilters } from "@/contexts/FilterContext";
 import { GenerationFilter } from "./GenerationFilter";
 import { TypeFilter } from "./TypeFilter";
 import { SearchFilters } from "./SearchFilters";
 
-interface FiltersProps {
-  generations: Generation[];
-  types: Type[];
-  setPokemonListFiltered: (pokemonList: Pokemon[]) => void;
-  initialPokemonList: Pokemon[];
-  filteredPokemonList: Pokemon[];
-  setInitialPokemonList: (pokemonList: Pokemon[]) => void;
-}
-
-export function Filters({
-  generations, 
-  types, 
-  setPokemonListFiltered, 
-  initialPokemonList, 
-  filteredPokemonList, 
-  setInitialPokemonList
-}: FiltersProps) {
+export function Filters() {
   const { 
     filters: { selectedGeneration, selectedType, searchText },
+    pokemonData,
     setSelectedGeneration,
     setSelectedType,
-    setSearchText
+    setSearchText,
+    initializePokemonData,
+    setLoading,
+    setGlobalSearchResults,
+    applyFilters
   } = useFilters();
 
-  // Fetch generation-specific Pokemon when generation is selected
+  // Fetch generation-specific Pokemon when generation changes
   const { data: generationPokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery(
     { generationId: Number(selectedGeneration) },
     { 
@@ -61,112 +47,56 @@ export function Filters({
     }
   );
 
-  // Update filtered list when generation data changes
+  // Update context loading state
   useEffect(() => {
-    if (selectedGeneration === "") {
-      if (initialPokemonList.length > 0) {
-        setInitialPokemonList(initialPokemonList);
-      }
-    } else if (generationPokemonList) {
-      setInitialPokemonList(generationPokemonList);
-      setPokemonListFiltered(generationPokemonList);
+    setLoading(pokemonLoading || globalSearchLoading);
+  }, [pokemonLoading, globalSearchLoading, setLoading]);
+
+  // Update Pokemon list when generation data changes
+  useEffect(() => {
+    if (generationPokemonList && selectedGeneration !== "") {
+      // Update the original list with generation-specific Pokemon
+      initializePokemonData({
+        pokemonList: generationPokemonList,
+        generations: pokemonData.generations,
+        types: pokemonData.types
+      });
+      // Clear any previous global search results
+      setGlobalSearchResults(null);
     }
-  }, [selectedGeneration, generationPokemonList, initialPokemonList, setInitialPokemonList, setPokemonListFiltered]);
+  }, [selectedGeneration, generationPokemonList, initializePokemonData, pokemonData.generations, pokemonData.types, setGlobalSearchResults]);
 
   // Handle global search result
   useEffect(() => {
     if (globalPokemonResult) {
-      // Add the globally found Pokemon to the filtered list
-      setPokemonListFiltered(globalPokemonResult);
+      setGlobalSearchResults(globalPokemonResult);
     }
-  }, [globalPokemonResult, setPokemonListFiltered]);
+  }, [globalPokemonResult, setGlobalSearchResults]);
 
-  // Reapply filters when component mounts if there are active filter states
+  // Apply filters when type or search text changes (but not for global search)
   useEffect(() => {
-    if (initialPokemonList.length > 0) {
-      // Check if we have active filters that need to be reapplied
-      const hasActiveTypeFilter = selectedType !== "";
-      const hasActiveSearchFilter = searchText !== "";
-      
-      if (hasActiveTypeFilter || hasActiveSearchFilter) {
-        // Reapply filters using the existing logic
-        applyCurrentFilters();
-      }
+    if (!pokemonData.globalSearchResults) {
+      applyFilters();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialPokemonList.length]);
-
-  // Pure function to apply type filter
-  const applyTypeFilter = (pokemonList: Pokemon[], typeId: string): Pokemon[] => {
-    if (typeId === "") {
-      return pokemonList;
-    }
-    return pokemonList.filter(
-      (pokemon) => pokemon.types.some((type) => type.id === parseInt(typeId))
-    );
-  };
-
-  // Pure function to apply search filter (includes evolution chains)
-  const applySearchFilter = (pokemonList: Pokemon[], searchTerm: string): Pokemon[] => {
-    if (searchTerm === "") {
-      return pokemonList;
-    }
-    
-    const searchTermLower = searchTerm.toLowerCase();
-    
-    // Find Pokemon that match the search term
-    const matchingPokemon = pokemonList.filter((pokemon) => {
-      return pokemon.name.toLowerCase().includes(searchTermLower);
-    });
-
-    // Get all evolution chains from matching Pokemon
-    const allEvolutionPokemon: Pokemon[] = [];
-    matchingPokemon.forEach((pokemon) => {
-      allEvolutionPokemon.push(...pokemon.evolutionChain);
-    });
-
-    // Remove duplicates based on Pokemon name
-    return allEvolutionPokemon.filter((pokemon, index, self) => 
-      index === self.findIndex((p) => p.name === pokemon.name)
-    );
-  };
-
-  const applyCurrentFilters = () => {
-    applyAllFilters();
-  };
-
-  // Common function to apply all filters with optional overrides
-  const applyAllFilters = (typeOverride?: string, searchOverride?: string) => {
-    let listToFilter = selectedGeneration !== "" && generationPokemonList 
-      ? generationPokemonList 
-      : initialPokemonList;
-
-    // Apply type filter (use override if provided, otherwise current state)
-    const typeToUse = typeOverride ?? selectedType;
-    listToFilter = applyTypeFilter(listToFilter, typeToUse);
-    
-    // Apply search filter (use override if provided, otherwise current state)
-    const searchToUse = searchOverride ?? searchText;
-    listToFilter = applySearchFilter(listToFilter, searchToUse);
-
-    setPokemonListFiltered(listToFilter);
-  };
+  }, [selectedType, searchText, pokemonData.globalSearchResults, applyFilters]);
 
   // Handler functions for child components
   const handleGenerationChange = (generationId: string) => {
     setSelectedGeneration(generationId);
-    // Reset type filter when generation changes
-    setSelectedType("");
+    setSelectedType(""); // This is handled in the context
+    setSearchText(""); // This is handled in the context
   };
 
   const handleTypeChange = (typeId: string) => {
     setSelectedType(typeId);
-    applyAllFilters(typeId);
+    // Clear global search results when filtering locally
+    setGlobalSearchResults(null);
   };
 
   const handleSearchChange = (searchValue: string) => {
     setSearchText(searchValue);
-    applyAllFilters(undefined, searchValue);
+    // Clear global search results when changing search locally
+    setGlobalSearchResults(null);
   };
 
   const handleGlobalSearch = () => {
@@ -195,14 +125,14 @@ export function Filters({
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <GenerationFilter
-          generations={generations}
+          generations={pokemonData.generations}
           selectedGeneration={selectedGeneration}
           onGenerationChange={handleGenerationChange}
           disabled={isLoading}
         />
         
         <TypeFilter
-          types={types}
+          types={pokemonData.types}
           selectedType={selectedType}
           onTypeChange={handleTypeChange}
           disabled={isLoading}
@@ -213,7 +143,7 @@ export function Filters({
         searchText={searchText}
         onSearchChange={handleSearchChange}
         onGlobalSearch={handleGlobalSearch}
-        filteredPokemonList={filteredPokemonList}
+        filteredPokemonList={pokemonData.filteredList}
         disabled={isLoading}
         globalSearchLoading={globalSearchLoading}
         globalSearchError={globalSearchError}
