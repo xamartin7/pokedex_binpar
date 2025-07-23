@@ -6,14 +6,14 @@ import { MainPokemonInfo } from "../_components/details/MainPokemonInfo";
 import { PokemonStats } from "../_components/details/PokemonStats";
 
 interface PageProps {
-  params: { id: string };
-  searchParams: { originId?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ originId?: string }>;
 }
 
-
 export default async function PokemonDetailPage({ params, searchParams }: PageProps) {
-  const { id } = params;
-  const { originId } = searchParams;
+  // Await the params and searchParams
+  const { id } = await params;
+  const { originId } = await searchParams;
   const pokemonId = Number(id);
 
   if (isNaN(pokemonId)) {
