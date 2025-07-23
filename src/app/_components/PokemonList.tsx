@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PokemonCard } from "./PokemonCard";
 import type { Type } from "@/server/modules/types/domain/entities/Type";
 import { PaginationSection } from "./PaginationSection";
-import { Filters } from "./Filters";
+import { Filters } from "./filters/Filters";
 
 interface PokemonListProps {
   initialData: {
