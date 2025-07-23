@@ -23,8 +23,8 @@ export function PaginationSection({
 
   // Reset to first page when pokemon list changes (e.g., when filters are applied)
   useEffect(() => {
-    setCurrentPage(INITIAL_CURRENT_PAGE);
-  }, [pokemonList, setCurrentPage]);
+    setCurrentPage(currentPage ?? INITIAL_CURRENT_PAGE);
+  }, [pokemonList, setCurrentPage, currentPage]);
 
   // Calculate paginated data and update context
   useEffect(() => {
@@ -42,7 +42,7 @@ export function PaginationSection({
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(INITIAL_CURRENT_PAGE); // Reset to first page when changing page size
   };
 
   const getPaginationRange = () => {
