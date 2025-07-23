@@ -175,7 +175,6 @@ export function Filters() {
 
   // Handle global search result
   useEffect(() => {
-    console.log('globalPokemonResult', globalPokemonResult);
     if (globalPokemonResult) {
       setGlobalSearchResults(globalPokemonResult);
       // Update filtered list with global search results
