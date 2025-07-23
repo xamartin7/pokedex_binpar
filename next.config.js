@@ -14,6 +14,14 @@ const config = {
       },
     ],
   },
+  // Skip ESLint during build when SKIP_ENV_VALIDATION is set (useful for Docker)
+  eslint: {
+    ignoreDuringBuilds: process.env.SKIP_ENV_VALIDATION === "1",
+  },
+  // Skip TypeScript checking during build when SKIP_ENV_VALIDATION is set
+  typescript: {
+    ignoreBuildErrors: process.env.SKIP_ENV_VALIDATION === "1",
+  },
 };
 
 export default config;
