@@ -176,9 +176,10 @@ export function Filters() {
   // Handle global search result
   useEffect(() => {
     if (globalPokemonResult) {
-      setGlobalSearchResults(globalPokemonResult);
+      // setGlobalSearchResults(globalPokemonResult);
       // Update filtered list with global search results
-      updateFilteredList(globalPokemonResult);
+      const pokemonsEvolutions = globalPokemonResult.map((pokemon) => pokemon.evolutionChain).flat();
+      updateFilteredList(pokemonsEvolutions);
     }
   }, [globalPokemonResult, globalSearchTriggered, setGlobalSearchResults, updateFilteredList]);
 
