@@ -52,6 +52,13 @@ export function SearchFilters({
         onGlobalSearch();
       }
     }
+
+    if (event.ctrlKey && event.key === 'Enter') {
+      event.preventDefault();
+      if (searchText.trim()) {
+        onGlobalSearch();
+      }
+    }
   };
 
   // Get error message based on error type
@@ -86,7 +93,7 @@ export function SearchFilters({
         disabled={disabled}
       />
       <p className="mt-1 text-xs text-gray-500">
-        Type to search Pokemon names and their evolutions in real time
+        Type to search Pokemon names and their evolutions in real time. Press <span className="font-bold">Ctrl + Enter</span> to search globally.
       </p>
       
       {/* Global Search Button */}
