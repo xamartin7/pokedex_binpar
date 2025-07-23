@@ -5,6 +5,7 @@ import { PaginationSection } from "./PaginationSection";
 import { Filters } from "./filters/Filters";
 import { useFilters } from "@/contexts/FilterContext";
 
+
 export function PokemonList() {
   const { pokemonData } = useFilters();
 
@@ -18,7 +19,6 @@ export function PokemonList() {
         <div className="mb-6">
           <PaginationSection
             pokemonList={pokemonData.filteredList}
-            initialPageSize={12}
           />
         </div>
 

@@ -11,7 +11,7 @@ const DEFAULT_GENERATION_ID = 1;
 
 export default function Home() {
   const [showContent, setShowContent] = useState(false);
-  const { initializePokemonData, applyFilters, pokemonData } = useFilters();
+  const { initializePokemonData, pokemonData } = useFilters();
   
   // Load initial data with default generation
   const { data: generations, isLoading: generationsLoading } = api.pokemon.getGenerations.useQuery(
@@ -56,12 +56,6 @@ export default function Home() {
     }
   }, [allDataLoaded, pokemonList, generations, types, initializePokemonData, pokemonData.originalList.length]);
 
-  // Apply initial filters when data is initialized
-  useEffect(() => {
-    if (pokemonData.originalList.length > 0) {
-      applyFilters();
-    }
-  }, [pokemonData.originalList.length, applyFilters]);
 
   useEffect(() => {
     if (allDataLoaded && pokemonData.originalList.length > 0) {
