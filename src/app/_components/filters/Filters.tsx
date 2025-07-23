@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { api } from "@/trpc/react";
 import { useFilters } from "@/contexts/FilterContext";
 import { GenerationFilter } from "./GenerationFilter";
 import { TypeFilter } from "./TypeFilter";
 import { SearchFilters } from "./SearchFilters";
+import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 
 export function Filters() {
   const { 
@@ -17,7 +18,7 @@ export function Filters() {
     initializePokemonData,
     setLoading,
     setGlobalSearchResults,
-    applyFilters
+    updateFilteredList
   } = useFilters();
   
   const [globalSearchTriggered, setGlobalSearchTriggered] = useState(0);
@@ -54,26 +55,87 @@ export function Filters() {
   );
 
   // ============================================================================
+  // FILTER UTILITY FUNCTIONS
+  // ============================================================================
+  
+  const applyTypeFilter = useCallback((pokemonList: Pokemon[], typeId: string): Pokemon[] => {
+    if (typeId === "") {
+      return pokemonList;
+    }
+    return pokemonList.filter(
+      (pokemon) => pokemon.types.some((type) => type.id === parseInt(typeId))
+    );
+  }, []);
+
+  const applySearchFilter = useCallback((pokemonList: Pokemon[], searchTerm: string): Pokemon[] => {
+    if (searchTerm === "") {
+      return pokemonList;
+    }
+    
+    const searchTermLower = searchTerm.toLowerCase();
+    
+    // Find Pokemon that match the search term
+    const matchingPokemon = pokemonList.filter((pokemon) => {
+      return pokemon.name.toLowerCase().includes(searchTermLower);
+    });
+
+    // Get all evolution chains from matching Pokemon
+    const allEvolutionPokemon: Pokemon[] = [];
+    matchingPokemon.forEach((pokemon) => {
+      allEvolutionPokemon.push(...pokemon.evolutionChain);
+    });
+
+    // Remove duplicates based on Pokemon name
+    return allEvolutionPokemon.filter((pokemon, index, self) => 
+      index === self.findIndex((p) => p.name === pokemon.name)
+    );
+  }, []);
+
+  const applyLocalFilters = useCallback((pokemonList: Pokemon[], typeId: string, searchTerm: string): Pokemon[] => {
+    let listToFilter = pokemonList;
+
+    // Apply type filter
+    listToFilter = applyTypeFilter(listToFilter, typeId);
+    
+    // Apply search filter
+    listToFilter = applySearchFilter(listToFilter, searchTerm);
+
+    return listToFilter;
+  }, [applyTypeFilter, applySearchFilter]);
+
+  // ============================================================================
   // FILTER COORDINATION HANDLERS
   // ============================================================================
   
   const handleGenerationChange = (generationId: string) => {
     setSelectedGeneration(generationId);
-    // Clear dependent filters when generation changes
-    setSelectedType("");
-    setSearchText("");
+    // Clear global search results when generation changes
+    setGlobalSearchResults(null);
+    // Note: Filters will be applied when generationPokemonList updates via useEffect
   };
 
   const handleTypeChange = (typeId: string) => {
     setSelectedType(typeId);
     // Clear global search results when filtering locally
     setGlobalSearchResults(null);
+    
+    // Apply filters immediately if not using global search
+    if (!pokemonData.globalSearchResults) {
+      const filteredList = applyLocalFilters(pokemonData.originalList, typeId, searchText);
+      updateFilteredList(filteredList);
+    }
   };
 
   const handleSearchChange = (searchValue: string) => {
     setSearchText(searchValue);
     // Clear global search results when changing search locally
     setGlobalSearchResults(null);
+    
+    // Apply filters immediately if not using global search
+    if (!pokemonData.globalSearchResults) {
+      const filteredList = applyLocalFilters(pokemonData.originalList, selectedType, searchValue);
+      updateFilteredList(filteredList);
+    }
   };
 
   const handleGlobalSearch = () => {
@@ -92,7 +154,7 @@ export function Filters() {
     setLoading(pokemonLoading || globalSearchLoading);
   }, [pokemonLoading, globalSearchLoading, setLoading]);
 
-  // Update Pokemon list when generation data changes (optimized dependencies)
+  // Update Pokemon list when generation data changes and apply initial filters
   useEffect(() => {
     if (generationPokemonList && selectedGeneration !== "") {
       // Update the original list with generation-specific Pokemon
@@ -101,25 +163,24 @@ export function Filters() {
         generations: pokemonData.generations,
         types: pokemonData.types
       });
+      
       // Clear any previous global search results
       setGlobalSearchResults(null);
+      
+      // Apply current filters to the new generation data
+      const filteredList = applyLocalFilters(generationPokemonList, selectedType, searchText);
+      updateFilteredList(filteredList);
     }
-  }, [selectedGeneration, generationPokemonList]); // Removed stable dependencies
+  }, [selectedGeneration, generationPokemonList, selectedType, searchText, initializePokemonData, setGlobalSearchResults, applyLocalFilters, updateFilteredList, pokemonData.generations, pokemonData.types]);
 
   // Handle global search result
   useEffect(() => {
-    console.log('globalPokemonResult', globalPokemonResult);
     if (globalPokemonResult) {
       setGlobalSearchResults(globalPokemonResult);
+      // Update filtered list with global search results
+      updateFilteredList(globalPokemonResult);
     }
-  }, [globalPokemonResult, globalSearchTriggered]);
-
-  // Apply filters when type or search text changes (but not for global search)
-  useEffect(() => {
-    if (!pokemonData.globalSearchResults) {
-      applyFilters();
-    }
-  }, [selectedType, searchText, pokemonData.globalSearchResults, applyFilters]);
+  }, [globalPokemonResult, globalSearchTriggered, setGlobalSearchResults, updateFilteredList]);
 
   // ============================================================================
   // RENDER
