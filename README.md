@@ -7,7 +7,7 @@
 ### Requisitos previos
 
 Tener instalados:
-- [Node.js](https://nodejs.org/)
+- [Node.js](https://nodejs.org/) (v18 o mayor)
 - [pnpm](https://pnpm.io/) (recomendado) or [npm](https://npmjs.com/)
 
 ### Instalación
