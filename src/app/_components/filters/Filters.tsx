@@ -75,7 +75,7 @@ export function Filters() {
   };
 
   const handleGlobalSearch = () => {
-    if (searchText.trim()) {
+    if (searchText.trim().length > 0) {
       void searchGlobalPokemon();
     }
   };
@@ -105,6 +105,7 @@ export function Filters() {
 
   // Handle global search result (simplified)
   useEffect(() => {
+    console.log('globalPokemonResult', globalPokemonResult);
     if (globalPokemonResult) {
       setGlobalSearchResults(globalPokemonResult);
     }

@@ -52,10 +52,9 @@ export function SearchFilters({
         onGlobalSearch();
       }
     }
-
     if (event.ctrlKey && event.key === 'Enter') {
       event.preventDefault();
-      if (searchText.trim()) {
+      if (searchText.trim().length > 0) {
         onGlobalSearch();
       }
     }
