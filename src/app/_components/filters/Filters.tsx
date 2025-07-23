@@ -20,6 +20,10 @@ export function Filters() {
     applyFilters
   } = useFilters();
 
+  // ============================================================================
+  // API QUERIES
+  // ============================================================================
+  
   // Fetch generation-specific Pokemon when generation changes
   const { data: generationPokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery(
     { generationId: Number(selectedGeneration) },
@@ -47,44 +51,15 @@ export function Filters() {
     }
   );
 
-  // Update context loading state
-  useEffect(() => {
-    setLoading(pokemonLoading || globalSearchLoading);
-  }, [pokemonLoading, globalSearchLoading, setLoading]);
-
-  // Update Pokemon list when generation data changes
-  useEffect(() => {
-    if (generationPokemonList && selectedGeneration !== "") {
-      // Update the original list with generation-specific Pokemon
-      initializePokemonData({
-        pokemonList: generationPokemonList,
-        generations: pokemonData.generations,
-        types: pokemonData.types
-      });
-      // Clear any previous global search results
-      setGlobalSearchResults(null);
-    }
-  }, [selectedGeneration, generationPokemonList, initializePokemonData, pokemonData.generations, pokemonData.types, setGlobalSearchResults]);
-
-  // Handle global search result
-  useEffect(() => {
-    if (globalPokemonResult) {
-      setGlobalSearchResults(globalPokemonResult);
-    }
-  }, [globalPokemonResult, setGlobalSearchResults]);
-
-  // Apply filters when type or search text changes (but not for global search)
-  useEffect(() => {
-    if (!pokemonData.globalSearchResults) {
-      applyFilters();
-    }
-  }, [selectedType, searchText, pokemonData.globalSearchResults, applyFilters]);
-
-  // Handler functions for child components
+  // ============================================================================
+  // FILTER COORDINATION HANDLERS
+  // ============================================================================
+  
   const handleGenerationChange = (generationId: string) => {
     setSelectedGeneration(generationId);
-    setSelectedType(""); // This is handled in the context
-    setSearchText(""); // This is handled in the context
+    // Clear dependent filters when generation changes
+    setSelectedType("");
+    setSearchText("");
   };
 
   const handleTypeChange = (typeId: string) => {
@@ -105,6 +80,47 @@ export function Filters() {
     }
   };
 
+  // ============================================================================
+  // SIDE EFFECTS (OPTIMIZED)
+  // ============================================================================
+  
+  // Update context loading state
+  useEffect(() => {
+    setLoading(pokemonLoading || globalSearchLoading);
+  }, [pokemonLoading, globalSearchLoading, setLoading]);
+
+  // Update Pokemon list when generation data changes (optimized dependencies)
+  useEffect(() => {
+    if (generationPokemonList && selectedGeneration !== "") {
+      // Update the original list with generation-specific Pokemon
+      initializePokemonData({
+        pokemonList: generationPokemonList,
+        generations: pokemonData.generations,
+        types: pokemonData.types
+      });
+      // Clear any previous global search results
+      setGlobalSearchResults(null);
+    }
+  }, [selectedGeneration, generationPokemonList]); // Removed stable dependencies
+
+  // Handle global search result (simplified)
+  useEffect(() => {
+    if (globalPokemonResult) {
+      setGlobalSearchResults(globalPokemonResult);
+    }
+  }, [globalPokemonResult]);
+
+  // Apply filters when type or search text changes (but not for global search)
+  useEffect(() => {
+    if (!pokemonData.globalSearchResults) {
+      applyFilters();
+    }
+  }, [selectedType, searchText, pokemonData.globalSearchResults, applyFilters]);
+
+  // ============================================================================
+  // RENDER
+  // ============================================================================
+  
   const isLoading = pokemonLoading || globalSearchLoading;
 
   return (
