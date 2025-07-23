@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { api } from "@/trpc/react";
 import { useFilters } from "@/contexts/FilterContext";
 import { GenerationFilter } from "./GenerationFilter";
@@ -19,6 +19,8 @@ export function Filters() {
     setGlobalSearchResults,
     applyFilters
   } = useFilters();
+  
+  const [globalSearchTriggered, setGlobalSearchTriggered] = useState(0);
 
   // ============================================================================
   // API QUERIES
@@ -76,6 +78,7 @@ export function Filters() {
 
   const handleGlobalSearch = () => {
     if (searchText.trim().length > 0) {
+      setGlobalSearchTriggered(prev => prev + 1);
       void searchGlobalPokemon();
     }
   };
@@ -103,13 +106,13 @@ export function Filters() {
     }
   }, [selectedGeneration, generationPokemonList]); // Removed stable dependencies
 
-  // Handle global search result (simplified)
+  // Handle global search result
   useEffect(() => {
     console.log('globalPokemonResult', globalPokemonResult);
     if (globalPokemonResult) {
       setGlobalSearchResults(globalPokemonResult);
     }
-  }, [globalPokemonResult]);
+  }, [globalPokemonResult, globalSearchTriggered]);
 
   // Apply filters when type or search text changes (but not for global search)
   useEffect(() => {
