@@ -49,9 +49,7 @@ Tener instalados:
    O crea un fichero `.env` con las variables:
    ```env
    AUTH_SECRET="test"
-   AUTH_DISCORD_ID="test"
-   AUTH_DISCORD_SECRET="test"
-   DATABASE_URL="file:./db.sqlite"
+   NODE_ENV="development"
    ```
 
 ### 🎯 Arrancar la aplicación
