@@ -19,7 +19,8 @@ export class PokemonDataGeneratorFacade implements IPokemonsDataGeneratorFacade 
     async generateListByGeneration(generationId: number): Promise<Pokemon[]> {
         const generation = await this.pokeApiRepository.getOneGeneration(`https://pokeapi.co/api/v2/generation/${generationId}`)
         const pokemons = await Promise.all(generation.pokemon_species.map(async (pokemon) => {
-            const pokemonId = Number(pokemon.url.split('/')[6])
+            const pokemonId = IdsUrlExtractor.extractIdFromUrl(pokemon.url)
+            if (pokemonId === null) throw new Error(`Pokemon ID is null for ${pokemon.url}`)
             const pokemonObj = await this.pokemonFactory.createPokemon(pokemonId)
             const evolutionChain = await this.evolutionChainGenerator.generateEvolutionChain(pokemonObj.evolutionChainUrl)
             pokemonObj.evolutionChain = evolutionChain

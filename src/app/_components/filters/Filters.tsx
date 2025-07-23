@@ -94,7 +94,7 @@ export function Filters({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialPokemonList.length]); // Only run when initialPokemonList is first populated
+  }, [initialPokemonList.length]);
 
   // Pure function to apply type filter
   const applyTypeFilter = (pokemonList: Pokemon[], typeId: string): Pokemon[] => {
