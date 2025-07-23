@@ -1,52 +1,52 @@
-# 🔥 Pokédex
+# Pokédex
 
-> A modern, comprehensive Pokédex application built with Next.js, featuring all Pokémon generations with detailed information, statistics, and evolution chains.
+> Moderna enciclopedia pokemon para buscar y ver los datos de todos ellos.
 
-## 🚀 Quick Start
+## Para inicializarla en local
 
-### Prerequisites
+### Requisitos previos
 
-Make sure you have one of the following package managers installed:
-- [Node.js](https://nodejs.org/) (v18 or higher)
-- [pnpm](https://pnpm.io/) (recommended) or [npm](https://npmjs.com/)
+Tener instalados:
+- [Node.js](https://nodejs.org/) (v18 o mayor)
+- [pnpm](https://pnpm.io/) (recomendado) or [npm](https://npmjs.com/)
 
-### 📦 Installation
+### Instalación
 
-1. **Clone the repository**
+1. **Clona el repositorio**
    ```bash
    git clone https://github.com/xamartin7/pokedex_binpar.git
    ```
    
-   Or using SSH:
+   O en SSH:
    ```bash
    git clone git@github.com:xamartin7/pokedex_binpar.git
    ```
 
-2. **Navigate to the project directory**
+2. **Navega al directorio del proyecto**
    ```bash
    cd pokedex_binpar
    ```
 
-3. **Install dependencies**
+3. **Instala las dependencias**
    
-   Using pnpm (recommended):
+   Con pnpm (recommended):
    ```bash
    pnpm install
    ```
    
-   Using npm:
+   Con npm:
    ```bash
    npm install
    ```
 
-### ⚙️ Environment Setup
+### ⚙️ Variables de entorno
 
-1. **Create environment file**
+1. **Crea el fichero de variables de entorno**
    ```bash
    cp .env.example .env
    ```
    
-   Or create a new `.env` file with the following variables:
+   O crea un fichero `.env` con las variables:
    ```env
    AUTH_SECRET="test"
    AUTH_DISCORD_ID="test"
@@ -54,94 +54,33 @@ Make sure you have one of the following package managers installed:
    DATABASE_URL="file:./db.sqlite"
    ```
 
-### 🎯 Running the Application
+### 🎯 Arrancar la aplicación
 
-#### Production Build
+#### Producción
 
-Using pnpm:
+Con pnpm:
 ```bash
 pnpm run build
 pnpm run start
 ```
 
-Using npm:
+Con npm:
 ```bash
 npm run build
 npm run start
 ```
 
-#### Development Mode
+#### En desarrollo
 
-Using pnpm:
+Con pnpm:
 ```bash
 pnpm run dev
 ```
 
-Using npm:
+Con npm:
 ```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:3000`
-
-## 🛠️ Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `dev` | Starts the development server |
-| `build` | Creates an optimized production build |
-| `start` | Starts the production server |
-| `lint` | Runs ESLint to check code quality |
-| `lint:fix` | Runs ESLint and fixes auto-fixable issues |
-| `type-check` | Runs TypeScript type checking |
-
-## 🏗️ Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router pages
-├── components/             # Reusable UI components
-├── contexts/              # React contexts
-├── server/                # Backend logic (tRPC, auth, database)
-├── styles/                # Global styles
-├── trpc/                  # tRPC client configuration
-└── types/                 # TypeScript type definitions
-```
-
-## 🔧 Tech Stack
-
-- **Framework**: Next.js 14 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Database**: SQLite with Prisma ORM
-- **API**: tRPC for type-safe APIs
-- **Authentication**: NextAuth.js
-- **Package Manager**: pnpm
-
-## 📝 Features
-
-- 📱 Responsive design for all devices
-- 🔍 Advanced search and filtering
-- 📊 Detailed Pokémon statistics and information
-- 🔄 Evolution chains visualization
-- 🎨 Modern and intuitive UI
-- ⚡ Fast performance with Next.js optimizations
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<div align="center">
-Made with ❤️ for Pokémon fans everywhere
-</div>
+La aplicación deberia de estar disponible en la ruta `http://localhost:3000`
 
