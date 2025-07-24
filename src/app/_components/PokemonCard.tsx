@@ -27,31 +27,31 @@ export function PokemonCard({pokemon}: {pokemon: Pokemon}) {
   return (
     <Link href={`/${pokemon.id}`} className="block hover:scale-105 transition-transform duration-100">
       <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-100 overflow-hidden border border-gray-200 cursor-pointer">
-        <div className="relative h-48 bg-gray-50 flex items-center justify-center">
+        <div className="relative h-32 bg-gray-50 flex items-center justify-center">
           <Image 
             src={pokemon.image} 
             alt={pokemon.name} 
-            width={120} 
-            height={120}
+            width={80} 
+            height={80}
             className="object-contain hover:scale-110 transition-transform duration-100"
           />
         </div>
         
-        <div className="p-4">
-          <h3 className="text-xl font-bold text-gray-800 mb-2 capitalize">
+        <div className="p-3">
+          <h3 className="text-lg font-bold text-gray-800 mb-2 capitalize">
             {pokemon.name}
           </h3>
           
-          <div className="space-y-2">
+          <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 font-medium">Type:</span>
+              <span className="text-xs text-gray-600 font-medium">Type:</span>
               <div className="flex gap-1 flex-wrap">
                 {pokemon.types.map((type) => {
                   const typeColor = typeColors[type.name.toLowerCase()] ?? "bg-gray-500";
                   return (
                     <span 
                       key={type.id}
-                      className={`px-3 py-1 rounded-full text-white text-sm font-medium ${typeColor} capitalize`}
+                      className={`px-2 py-0.5 rounded-full text-white text-xs font-medium ${typeColor} capitalize`}
                     >
                       {type.name}
                     </span>
@@ -61,14 +61,14 @@ export function PokemonCard({pokemon}: {pokemon: Pokemon}) {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 font-medium">Generation:</span>
-              <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-medium">
+              <span className="text-xs text-gray-600 font-medium">Generation:</span>
+              <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 text-xs font-medium">
                 {pokemon.generation.name}
               </span>
             </div>
           </div>
           
-          <div className="mt-3 pt-3 border-t border-gray-100">
+          <div className="mt-2 pt-2 border-t border-gray-100">
             <span className="text-xs text-gray-500">#{pokemon.id.toString().padStart(3, '0')}</span>
           </div>
         </div>
