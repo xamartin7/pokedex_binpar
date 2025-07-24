@@ -179,7 +179,10 @@ export function Filters() {
       // setGlobalSearchResults(globalPokemonResult);
       // Update filtered list with global search results
       const pokemonsEvolutions = globalPokemonResult.map((pokemon) => pokemon.evolutionChain).flat();
-      updateFilteredList(pokemonsEvolutions);
+      const uniquePokemons = pokemonsEvolutions.filter((pokemon, index, self) => 
+        index === self.findIndex((p) => p.name === pokemon.name)
+      );
+      updateFilteredList(uniquePokemons);
     }
   }, [globalPokemonResult, globalSearchTriggered, setGlobalSearchResults, updateFilteredList]);
 
