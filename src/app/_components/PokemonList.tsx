@@ -16,14 +16,16 @@ export function PokemonList() {
         <Filters />
 
         {/* Pagination Section */}
-        <div className="mb-6">
+        <div id="pagination-section" className="mb-6 scroll-mt-4">
           <PaginationSection
             pokemonList={pokemonData.filteredList}
           />
         </div>
 
         {/* Pokemon Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div
+          id="pokemon-list-container"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {pokemonData.paginatedList.map((pokemon) => (
             <PokemonCard key={pokemon.id} pokemon={pokemon} />
           ))}

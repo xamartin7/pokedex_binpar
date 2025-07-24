@@ -37,7 +37,10 @@ export function PaginationSection({
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     // Scroll to top when page changes
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const paginationSection = document.getElementById('pagination-section');
+    if (paginationSection) {
+      paginationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handlePageSizeChange = (newPageSize: number) => {
