@@ -46,12 +46,14 @@ interface FilterContextType {
   setGlobalSearchResults: (results: Pokemon[] | null) => void;
 }
 
+const INITIAL_PAGE_SIZE = 12;
+
 const defaultFilterState: FilterState = {
   selectedGeneration: "1", // Default to first generation
   selectedType: "",
   searchText: "",
   currentPage: 1,
-  pageSize: 12,
+  pageSize: INITIAL_PAGE_SIZE,
 };
 
 const defaultPokemonDataState: PokemonDataState = {
