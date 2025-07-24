@@ -13,18 +13,25 @@ export function PaginationSection({
   pokemonList,
 }: PaginationSectionProps) {
   const { 
-    filters: { currentPage, pageSize },
+    filters: { currentPage, pageSize, selectedGeneration },
+    pokemonData: { generations },
     setCurrentPage,
     setPageSize,
+    setSelectedGeneration,
     updatePaginatedList
   } = useFilters();
 
   const totalPages = Math.ceil(pokemonList.length / pageSize);
+  const currentGenerationId = parseInt(selectedGeneration);
+  const nextGeneration = generations.find(gen => gen.id === currentGenerationId + 1);
+  const previousGeneration = generations.find(gen => gen.id === currentGenerationId - 1);
+  const isLastPageAndHasNextGeneration = currentPage === totalPages && nextGeneration;
+  const isFirstPageAndHasPreviousGeneration = currentPage === 1 && previousGeneration;
 
   // Reset to first page when pokemon list changes (e.g., when filters are applied)
   useEffect(() => {
     setCurrentPage(currentPage ?? INITIAL_CURRENT_PAGE);
-  }, [pokemonList, setCurrentPage, currentPage]);
+  }, [pokemonList, setCurrentPage]);
 
   // Calculate paginated data and update context
   useEffect(() => {
@@ -40,6 +47,38 @@ export function PaginationSection({
     const paginationSection = document.getElementById('pagination-section');
     if (paginationSection) {
       paginationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleNextGeneration = () => {
+    if (nextGeneration) {
+      setSelectedGeneration(nextGeneration.id.toString());
+      // Scroll to top when generation changes
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePreviousGeneration = () => {
+    if (previousGeneration) {
+      setSelectedGeneration(previousGeneration.id.toString());
+      // Scroll to top when generation changes
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextClick = () => {
+    if (isLastPageAndHasNextGeneration) {
+      handleNextGeneration();
+    } else {
+      handlePageChange(currentPage + 1);
+    }
+  };
+
+  const handlePreviousClick = () => {
+    if (isFirstPageAndHasPreviousGeneration) {
+      handlePreviousGeneration();
+    } else {
+      handlePageChange(currentPage - 1);
     }
   };
 
@@ -67,11 +106,6 @@ export function PaginationSection({
     
     return range;
   };
-  
-
-  const startIndex = (currentPage - 1) * pageSize + 1;
-  const endIndex = Math.min(currentPage * pageSize, pokemonList.length);
-  const totalItems = pokemonList.length;
 
   return (
     <div className="space-y-4">
@@ -98,11 +132,15 @@ export function PaginationSection({
           <div className="flex items-center gap-2">
             {/* Previous button */}
             <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={handlePreviousClick}
+              disabled={currentPage === 1 && !previousGeneration}
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                currentPage === 1 && !previousGeneration
+                  ? 'text-gray-500 bg-white border border-gray-300 opacity-50 cursor-not-allowed'
+                  : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 hover:text-gray-700'
+              }`}
             >
-              Previous
+              {isFirstPageAndHasPreviousGeneration ? `Previous Gen ←` : 'Previous'}
             </button>
             
             {/* Page numbers */}
@@ -124,19 +162,21 @@ export function PaginationSection({
             
             {/* Next button */}
             <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={handleNextClick}
+              disabled={currentPage === totalPages && !nextGeneration}
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                isLastPageAndHasNextGeneration
+                  ? 'bg-green-600 text-white hover:bg-green-700 border border-green-600'
+                  : currentPage === totalPages && !nextGeneration
+                  ? 'text-gray-500 bg-white border border-gray-300 opacity-50 cursor-not-allowed'
+                  : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50 hover:text-gray-700'
+              }`}
+              title={isLastPageAndHasNextGeneration ? `Go to ${nextGeneration.name}` : 'Next page'}
             >
-              Next
+              {isLastPageAndHasNextGeneration ? `Next Gen →` : 'Next'}
             </button>
           </div>
         )}
-      </div>
-
-      {/* Results info */}
-      <div className="text-sm text-gray-600">
-        Showing {startIndex} to {endIndex} of {totalItems} Pokémon
       </div>
     </div>
   );
