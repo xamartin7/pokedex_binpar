@@ -2,7 +2,7 @@ import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 import { useEffect } from "react";
 import { useFilters } from "@/contexts/FilterContext";
 
-const PAGE_SIZE_OPTIONS = [6, 12, 18, 24, 30];
+const PAGE_SIZE_OPTIONS = [8, 12, 18, 24, 30];
 const INITIAL_CURRENT_PAGE = 1;
 
 interface PaginationSectionProps {
