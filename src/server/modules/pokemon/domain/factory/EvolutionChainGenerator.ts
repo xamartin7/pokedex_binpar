@@ -1,5 +1,6 @@
 import type { IPokeApiRepository, ChainLink } from "../../infrastructure/interfaces/IPokeApiRepository";
 import type { Pokemon } from "../entities/Pokemon";
+import { IdsUrlExtractor } from "../services/IdsUrlExtractor";
 import type { IPokemonFactory } from "./IPokemonFactory";
 
 export class EvolutionChainGenerator {
@@ -20,8 +21,8 @@ export class EvolutionChainGenerator {
         // Create simplified Pokemon objects for the evolution chain
         const evolutionChainPokemon = await Promise.all(
             speciesInChain.map(async (species) => {
-                const pokemonId = Number(species.url.split('/')[6])
-                
+                const pokemonId = IdsUrlExtractor.extractIdFromUrl(species.url)
+                if (pokemonId === null) throw new Error(`Pokemon ID is null for ${species.url}`)
                 const pokemon = await this.pokemonFactory.createPokemon(pokemonId)
                 return pokemon
             })
