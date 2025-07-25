@@ -1,4 +1,4 @@
-import type { IPokeApiRepository } from "../../infrastructure/interfaces/IPokeApiRepository";
+import type { IPokeApiRepository, PokemonDetailsResponse, PokemonSpeciesResponse } from "../../infrastructure/interfaces/IPokeApiRepository";
 import type { Pokemon } from "../entities/Pokemon";
 import type { IPokemonFactory } from "./IPokemonFactory";
 
@@ -12,7 +12,9 @@ export class PokemonAPIFactory implements IPokemonFactory {
 
     async createPokemon(pokemonId: number): Promise<Pokemon> {
         try {
-            return this.buildPokemon(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`, `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`)
+            const pokemonDetails = await this.pokeApiRepository.getPokemonDetails(pokemonId)
+            const pokemonSpecies = await this.pokeApiRepository.getPokemonSpecies(pokemonId)
+            return this.buildPokemon(pokemonDetails, pokemonSpecies)
         } catch (error) {
             console.error('Error creating pokemon by id:', error)
             throw error
@@ -21,17 +23,17 @@ export class PokemonAPIFactory implements IPokemonFactory {
 
     async createPokemonByName(pokemonName: string): Promise<Pokemon> {
         try {
-            return this.buildPokemon(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`,`https://pokeapi.co/api/v2/pokemon-species/${pokemonName}`)
+            const pokemonDetails = await this.pokeApiRepository.getPokemonDetailsByName(pokemonName)
+            const pokemonSpecies = await this.pokeApiRepository.getPokemonSpeciesByName(pokemonName)
+            return this.buildPokemon(pokemonDetails, pokemonSpecies)
         } catch (error) {
             console.error('Error creating pokemon by name:', error)
             throw error
         }
     }
 
-    private async buildPokemon(detailsUrl: string, speciesUrl: string): Promise<Pokemon> {
+    private async buildPokemon(pokemonDetails: PokemonDetailsResponse, pokemonSpecies: PokemonSpeciesResponse): Promise<Pokemon> {
         try {
-            const pokemonDetails = await this.pokeApiRepository.getPokemonDetails(detailsUrl)
-            const pokemonSpecies = await this.pokeApiRepository.getPokemonSpecies(speciesUrl)
             const pokemon: Pokemon = {
                 id: Number(pokemonDetails.id),
                 name: pokemonDetails.name,

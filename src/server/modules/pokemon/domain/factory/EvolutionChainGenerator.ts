@@ -11,8 +11,8 @@ export class EvolutionChainGenerator {
         this.pokeApiRepository = pokeApiRepository
     }
 
-    public async generateEvolutionChain(evolutionChainUrl: string): Promise<Pokemon[]> {
-        const evolutionChain = await this.pokeApiRepository.getPokemonEvolutionChain(evolutionChainUrl)
+    public async generateEvolutionChain(id: number): Promise<Pokemon[]> {
+        const evolutionChain = await this.pokeApiRepository.getPokemonEvolutionChain(id)
         
         // Extract all species from the evolution chain tree
         const speciesInChain = this.extractSpeciesFromChain(evolutionChain.chain)
