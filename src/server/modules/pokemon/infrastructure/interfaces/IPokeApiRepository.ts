@@ -74,9 +74,11 @@ export interface AllPokemonsResponse {
 
 export interface IPokeApiRepository {
     getGenerations(): Promise<GenerationsResponse>;
-    getOneGeneration(url: string): Promise<OneGenerationResponse>;
-    getPokemonSpecies(url: string): Promise<PokemonSpeciesResponse>;
-    getPokemonEvolutionChain(url: string): Promise<PokemonEvolutionChainResponse>;
-    getPokemonDetails(url: string): Promise<PokemonDetailsResponse>;
+    getOneGeneration(id: number): Promise<OneGenerationResponse>;
+    getPokemonSpecies(id: number): Promise<PokemonSpeciesResponse>;
+    getPokemonEvolutionChain(id: number): Promise<PokemonEvolutionChainResponse>;
+    getPokemonDetails(id: number): Promise<PokemonDetailsResponse>;
+    getPokemonDetailsByName(name: string): Promise<PokemonDetailsResponse>;
+    getPokemonSpeciesByName(name: string): Promise<PokemonSpeciesResponse>;
     getAllPokemons(): Promise<AllPokemonsResponse>;
 }

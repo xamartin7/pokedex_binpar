@@ -1,13 +1,18 @@
 import type { IPokeApiRepository, OneGenerationResponse, PokemonSpeciesResponse, GenerationsResponse, PokemonEvolutionChainResponse, PokemonDetailsResponse, AllPokemonsResponse } from "../interfaces/IPokeApiRepository";
 
 const POKEMON_API_URL = 'https://pokeapi.co/api/v2'
+const POKEMON_SPECIES_API_URL = `${POKEMON_API_URL}/pokemon-species`
+const POKEMON_EVOLUTION_CHAIN_API_URL = `${POKEMON_API_URL}/evolution-chain`
+const POKEMON_DETAILS_API_URL = `${POKEMON_API_URL}/pokemon`
+const POKEMON_GENERATION_API_URL = `${POKEMON_API_URL}/generation`
+
 const LIMIT_POKEMONS = 1025
 
 export class PokeApiRepository implements IPokeApiRepository {
 
     async getGenerations(): Promise<GenerationsResponse> {
         try {
-            const response = await this.fetchWithRetry(`${POKEMON_API_URL}/generation`);
+            const response = await this.fetchWithRetry(POKEMON_GENERATION_API_URL);
             return response.json() as Promise<GenerationsResponse>;
         } catch (error) {
             console.error('Error fetching generations:', error);
@@ -15,9 +20,9 @@ export class PokeApiRepository implements IPokeApiRepository {
         }
     }
 
-    async getOneGeneration(url_generation: string): Promise<OneGenerationResponse> {
+    async getOneGeneration(id: number): Promise<OneGenerationResponse> {
         try {
-            const response = await this.fetchWithRetry(url_generation);
+            const response = await this.fetchWithRetry(`${POKEMON_GENERATION_API_URL}/${id}`);
             return response.json() as Promise<OneGenerationResponse>;
         } catch (error) {
             console.error('Error fetching one generation:', error);
@@ -25,9 +30,9 @@ export class PokeApiRepository implements IPokeApiRepository {
         }
     }
 
-    async getPokemonSpecies(url: string): Promise<PokemonSpeciesResponse> {
+    async getPokemonSpecies(id: number): Promise<PokemonSpeciesResponse> {
         try {
-            const response = await this.fetchWithRetry(url);
+            const response = await this.fetchWithRetry(`${POKEMON_SPECIES_API_URL}/${id}`);
             return response.json() as Promise<PokemonSpeciesResponse>;
         } catch (error) {
             console.error('Error fetching pokemon species:', error);
@@ -35,9 +40,9 @@ export class PokeApiRepository implements IPokeApiRepository {
         }
     }
 
-    async getPokemonEvolutionChain(url: string): Promise<PokemonEvolutionChainResponse> {
+    async getPokemonEvolutionChain(id: number): Promise<PokemonEvolutionChainResponse> {
         try {
-            const response = await this.fetchWithRetry(url);
+            const response = await this.fetchWithRetry(`${POKEMON_EVOLUTION_CHAIN_API_URL}/${id}`);
             return response.json() as Promise<PokemonEvolutionChainResponse>;
         } catch (error) {
             console.error('Error fetching pokemon evolution chain:', error);
@@ -45,9 +50,9 @@ export class PokeApiRepository implements IPokeApiRepository {
         }
     }
 
-    async getPokemonDetails(url: string): Promise<PokemonDetailsResponse> {
+    async getPokemonDetails(id: number): Promise<PokemonDetailsResponse> {
         try {
-            const response = await this.fetchWithRetry(url);
+            const response = await this.fetchWithRetry(`${POKEMON_DETAILS_API_URL}/${id}`);
             return response.json() as Promise<PokemonDetailsResponse>;
         } catch (error) {
             console.error('Error fetching pokemon details:', error);
@@ -55,9 +60,29 @@ export class PokeApiRepository implements IPokeApiRepository {
         }
     }
 
+    async getPokemonDetailsByName(name: string): Promise<PokemonDetailsResponse> {
+        try {
+            const response = await this.fetchWithRetry(`${POKEMON_DETAILS_API_URL}/${name}`);
+            return response.json() as Promise<PokemonDetailsResponse>;
+        } catch (error) {
+            console.error('Error fetching pokemon details by name:', error);
+            throw error;
+        }
+    }
+
+    async getPokemonSpeciesByName(name: string): Promise<PokemonSpeciesResponse> {
+        try {
+            const response = await this.fetchWithRetry(`${POKEMON_SPECIES_API_URL}/${name}`);
+            return response.json() as Promise<PokemonSpeciesResponse>;
+        } catch (error) {
+            console.error('Error fetching pokemon species by name:', error);
+            throw error;
+        }
+    }
+
     async getAllPokemons(): Promise<AllPokemonsResponse> {
         try {
-            const response = await this.fetchWithRetry(`${POKEMON_API_URL}/pokemon?limit=${LIMIT_POKEMONS}`);
+            const response = await this.fetchWithRetry(`${POKEMON_DETAILS_API_URL}?limit=${LIMIT_POKEMONS}`);
             return response.json() as Promise<AllPokemonsResponse>;
         } catch (error) {
             console.error('Error fetching all pokemons:', error);
