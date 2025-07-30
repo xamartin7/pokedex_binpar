@@ -193,7 +193,7 @@ export function Filters() {
   const isLoading = pokemonLoading || globalSearchLoading;
 
   return (
-    <div className="mb-6 p-4 bg-gray-50 rounded-lg shadow-sm relative">
+    <div className="p-4 bg-gray-50 rounded-lg shadow-sm relative">
       {/* Loading Overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-gray-50/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
@@ -208,7 +208,7 @@ export function Filters() {
       
       <h2 className="text-xl font-semibold mb-4 text-gray-800">Filters</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-4">
         <GenerationFilter
           generations={pokemonData.generations}
           selectedGeneration={selectedGeneration}
