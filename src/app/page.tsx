@@ -3,6 +3,7 @@
 import { api } from "@/trpc/react";
 import { InitialLoading } from "./_components/InitialLoading";
 import { PokemonList } from "./_components/PokemonList";
+import { Filters } from "./_components/filters/Filters";
 import { TitlePage } from "./_components/TitlePage";
 import { useEffect, useState } from "react";
 import { useFilters } from "@/contexts/FilterContext";
@@ -79,7 +80,19 @@ export default function Home() {
   return (
     <div className="min-h-screen py-8">
       <TitlePage title="Pokédex" />
-      <PokemonList />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Filters - Left Side */}
+          <div className="lg:w-1/4 flex-shrink-0">
+            <Filters />
+          </div>
+          
+          {/* Pokemon List - Right Side */}
+          <div className="lg:w-3/4 flex-grow">
+            <PokemonList />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
