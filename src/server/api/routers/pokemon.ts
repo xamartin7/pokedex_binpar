@@ -65,5 +65,17 @@ export const pokemonRouter = createTRPCRouter({
         console.error('Error getting pokemon details by name:', error)
         throw error
       }
+    }),
+    getAllPokemonData: publicProcedure.query(async () => {
+      try {
+        // TODO Get all pokemons and types for all generations
+        const generations = await getGenerationsUseCase.getGenerations()
+        const types = await getTypesUseCase.getTypes(1)
+        const pokemonList = await getPokemonListUseCase.getByGeneration(1)
+        return { generations, types, pokemonList }
+      } catch (error) {
+        console.error('Error getting all pokemon data:', error)
+        throw error
+      }
     })
   })
