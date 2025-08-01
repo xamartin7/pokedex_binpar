@@ -7,8 +7,10 @@ import { GenerationFilter } from "./GenerationFilter";
 import { TypeFilter } from "./TypeFilter";
 import { SearchFilters } from "./SearchFilters";
 import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
+import type { Generation } from "@/server/modules/generations/domain/entities/Generation";
+import type { Type } from "@/server/modules/types/domain/entities/Type";
 
-export function Filters() {
+export function Filters({ generations, types }: { generations: Generation[], types: Type[] }) {
   const { 
     filters: { selectedGeneration, selectedType, searchText },
     pokemonData,
