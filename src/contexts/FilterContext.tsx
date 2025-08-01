@@ -49,7 +49,7 @@ interface FilterContextType {
 const INITIAL_PAGE_SIZE = 12;
 
 const defaultFilterState: FilterState = {
-  selectedGeneration: "1", // Default to first generation
+  selectedGeneration: "all", // Default to all generations
   selectedType: "",
   searchText: "",
   currentPage: 1,

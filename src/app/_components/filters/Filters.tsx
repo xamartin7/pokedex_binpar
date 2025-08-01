@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { api } from "@/trpc/react";
+import { useEffect, useCallback } from "react";
 import { useFilters } from "@/contexts/FilterContext";
 import { GenerationFilter } from "./GenerationFilter";
 import { TypeFilter } from "./TypeFilter";
@@ -10,7 +9,13 @@ import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
 import type { Generation } from "@/server/modules/generations/domain/entities/Generation";
 import type { Type } from "@/server/modules/types/domain/entities/Type";
 
-export function Filters({ generations, types }: { generations: Generation[], types: Type[] }) {
+interface FiltersProps {
+  generations: Generation[];
+  types: Type[];
+  pokemonList: Pokemon[];
+}
+
+export function Filters({ generations, types, pokemonList }: FiltersProps) {
   const { 
     filters: { selectedGeneration, selectedType, searchText },
     pokemonData,
@@ -22,44 +27,20 @@ export function Filters({ generations, types }: { generations: Generation[], typ
     setGlobalSearchResults,
     updateFilteredList
   } = useFilters();
-  
-  const [globalSearchTriggered, setGlobalSearchTriggered] = useState(0);
-
-  // ============================================================================
-  // API QUERIES
-  // ============================================================================
-  
-  // Fetch generation-specific Pokemon when generation changes
-  const { data: generationPokemonList, isLoading: pokemonLoading } = api.pokemon.getPokemonList.useQuery(
-    { generationId: Number(selectedGeneration) },
-    { 
-      enabled: selectedGeneration !== "",
-      staleTime: 60 * 60 * 1000, // 1 hour cache
-      gcTime: 60 * 60 * 1000, // 1 hour cache
-    }
-  );
-
-  // Global Pokemon search by name
-  const { 
-    data: globalPokemonResult, 
-    isLoading: globalSearchLoading,
-    error: globalSearchError,
-    isError: globalSearchIsError,
-    refetch: searchGlobalPokemon 
-  } = api.pokemon.getPokemonDetailsByName.useQuery(
-    { name: searchText.toLowerCase().trim() },
-    { 
-      enabled: false, // Only trigger manually
-      staleTime: 60 * 60 * 1000, // 1 hour cache
-      gcTime: 60 * 60 * 1000, // 1 hour cache
-      retry: false, // Don't retry on 404 errors
-    }
-  );
 
   // ============================================================================
   // FILTER UTILITY FUNCTIONS
   // ============================================================================
   
+  const applyGenerationFilter = useCallback((pokemonList: Pokemon[], generationId: string): Pokemon[] => {
+    if (generationId === "" || generationId === "all") {
+      return pokemonList;
+    }
+    return pokemonList.filter(
+      (pokemon) => pokemon.generation.id === parseInt(generationId)
+    );
+  }, []);
+
   const applyTypeFilter = useCallback((pokemonList: Pokemon[], typeId: string): Pokemon[] => {
     if (typeId === "") {
       return pokemonList;
@@ -93,9 +74,12 @@ export function Filters({ generations, types }: { generations: Generation[], typ
     );
   }, []);
 
-  const applyLocalFilters = useCallback((pokemonList: Pokemon[], typeId: string, searchTerm: string): Pokemon[] => {
+  const applyLocalFilters = useCallback((pokemonList: Pokemon[], generationId: string, typeId: string, searchTerm: string): Pokemon[] => {
     let listToFilter = pokemonList;
 
+    // Apply generation filter
+    listToFilter = applyGenerationFilter(listToFilter, generationId);
+    
     // Apply type filter
     listToFilter = applyTypeFilter(listToFilter, typeId);
     
@@ -103,7 +87,31 @@ export function Filters({ generations, types }: { generations: Generation[], typ
     listToFilter = applySearchFilter(listToFilter, searchTerm);
 
     return listToFilter;
-  }, [applyTypeFilter, applySearchFilter]);
+  }, [applyGenerationFilter, applyTypeFilter, applySearchFilter]);
+
+  const performGlobalSearch = useCallback((pokemonList: Pokemon[], searchTerm: string): Pokemon[] => {
+    if (searchTerm.trim() === "") {
+      return [];
+    }
+    
+    const searchTermLower = searchTerm.toLowerCase().trim();
+    
+    // Find Pokemon that match the search term by name
+    const matchingPokemon = pokemonList.filter((pokemon) => {
+      return pokemon.name.toLowerCase().includes(searchTermLower);
+    });
+
+    // Get all evolution chains from matching Pokemon
+    const allEvolutionPokemon: Pokemon[] = [];
+    matchingPokemon.forEach((pokemon) => {
+      allEvolutionPokemon.push(...pokemon.evolutionChain);
+    });
+
+    // Remove duplicates based on Pokemon name
+    return allEvolutionPokemon.filter((pokemon, index, self) => 
+      index === self.findIndex((p) => p.name === pokemon.name)
+    );
+  }, []);
 
   // ============================================================================
   // FILTER COORDINATION HANDLERS
@@ -113,7 +121,10 @@ export function Filters({ generations, types }: { generations: Generation[], typ
     setSelectedGeneration(generationId);
     // Clear global search results when generation changes
     setGlobalSearchResults(null);
-    // Note: Filters will be applied when generationPokemonList updates via useEffect
+    
+    // Apply filters immediately with new generation
+    const filteredList = applyLocalFilters(pokemonList, generationId, selectedType, searchText);
+    updateFilteredList(filteredList);
   };
 
   const handleTypeChange = (typeId: string) => {
@@ -121,11 +132,9 @@ export function Filters({ generations, types }: { generations: Generation[], typ
     // Clear global search results when filtering locally
     setGlobalSearchResults(null);
     
-    // Apply filters immediately if not using global search
-    if (!pokemonData.globalSearchResults) {
-      const filteredList = applyLocalFilters(pokemonData.originalList, typeId, searchText);
-      updateFilteredList(filteredList);
-    }
+    // Apply filters immediately
+    const filteredList = applyLocalFilters(pokemonList, selectedGeneration, typeId, searchText);
+    updateFilteredList(filteredList);
   };
 
   const handleSearchChange = (searchValue: string) => {
@@ -133,17 +142,15 @@ export function Filters({ generations, types }: { generations: Generation[], typ
     // Clear global search results when changing search locally
     setGlobalSearchResults(null);
     
-    // Apply filters immediately if not using global search
-    if (!pokemonData.globalSearchResults) {
-      const filteredList = applyLocalFilters(pokemonData.originalList, selectedType, searchValue);
-      updateFilteredList(filteredList);
-    }
+    // Apply filters immediately
+    const filteredList = applyLocalFilters(pokemonList, selectedGeneration, selectedType, searchValue);
+    updateFilteredList(filteredList);
   };
 
   const handleGlobalSearch = () => {
     if (searchText.trim().length > 0) {
-      setGlobalSearchTriggered(prev => prev + 1);
-      void searchGlobalPokemon();
+      const globalResults = performGlobalSearch(pokemonList, searchText);
+      updateFilteredList(globalResults);
     }
   };
 
@@ -151,48 +158,28 @@ export function Filters({ generations, types }: { generations: Generation[], typ
   // SIDE EFFECTS (OPTIMIZED)
   // ============================================================================
   
-  // Update context loading state
+  // Initialize data when component mounts
   useEffect(() => {
-    setLoading(pokemonLoading || globalSearchLoading);
-  }, [pokemonLoading, globalSearchLoading, setLoading]);
-
-  // Update Pokemon list when generation data changes and apply initial filters
-  useEffect(() => {
-    if (generationPokemonList && selectedGeneration !== "") {
-      // Update the original list with generation-specific Pokemon
-      initializePokemonData({
-        pokemonList: generationPokemonList,
-        generations: pokemonData.generations,
-        types: pokemonData.types
-      });
-      
-      // Clear any previous global search results
-      setGlobalSearchResults(null);
-      
-      // Apply current filters to the new generation data
-      const filteredList = applyLocalFilters(generationPokemonList, selectedType, searchText);
-      updateFilteredList(filteredList);
-    }
-  }, [selectedGeneration, generationPokemonList, selectedType, searchText, initializePokemonData, setGlobalSearchResults, applyLocalFilters, updateFilteredList, pokemonData.generations, pokemonData.types]);
-
-  // Handle global search result
-  useEffect(() => {
-    if (globalPokemonResult) {
-      // setGlobalSearchResults(globalPokemonResult);
-      // Update filtered list with global search results
-      const pokemonsEvolutions = globalPokemonResult.map((pokemon) => pokemon.evolutionChain).flat();
-      const uniquePokemons = pokemonsEvolutions.filter((pokemon, index, self) => 
-        index === self.findIndex((p) => p.name === pokemon.name)
-      );
-      updateFilteredList(uniquePokemons);
-    }
-  }, [globalPokemonResult, globalSearchTriggered, setGlobalSearchResults, updateFilteredList]);
+    // Initialize the context with all data
+    initializePokemonData({
+      pokemonList,
+      generations,
+      types
+    });
+    
+    // Clear loading state since we have all data
+    setLoading(false);
+    
+    // Apply initial filters
+    const filteredList = applyLocalFilters(pokemonList, selectedGeneration, selectedType, searchText);
+    updateFilteredList(filteredList);
+  }, [pokemonList, generations, types, selectedGeneration, selectedType, searchText, initializePokemonData, setLoading, applyLocalFilters, updateFilteredList]);
 
   // ============================================================================
   // RENDER
   // ============================================================================
   
-  const isLoading = pokemonLoading || globalSearchLoading;
+  const isLoading = pokemonData.isLoading;
 
   return (
     <div className="p-4 bg-gray-50 rounded-lg shadow-sm relative">
@@ -202,7 +189,7 @@ export function Filters({ generations, types }: { generations: Generation[], typ
           <div className="flex flex-col items-center space-y-2">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             <p className="text-sm text-gray-600 font-medium">
-              {pokemonLoading ? "Loading Pokemon..." : "Searching globally..."}
+              Loading Pokemon...
             </p>
           </div>
         </div>
@@ -232,9 +219,9 @@ export function Filters({ generations, types }: { generations: Generation[], typ
         onGlobalSearch={handleGlobalSearch}
         filteredPokemonList={pokemonData.filteredList}
         disabled={isLoading}
-        globalSearchLoading={globalSearchLoading}
-        globalSearchError={globalSearchError}
-        globalSearchIsError={globalSearchIsError}
+        globalSearchLoading={false}
+        globalSearchError={null}
+        globalSearchIsError={false}
       />
     </div>
   );

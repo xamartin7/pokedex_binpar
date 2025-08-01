@@ -1,4 +1,4 @@
-import { api, HydrateClient } from "@/trpc/server";
+import { HydrateClient } from "@/trpc/server";
 import { TitlePage } from "./_components/TitlePage";
 import { ErrorMessageLoadingScreen } from "./_components/ErrorMessageLoadingScreen";
 import { PokemonPageClient } from "./_components/PokemonPageClient";
