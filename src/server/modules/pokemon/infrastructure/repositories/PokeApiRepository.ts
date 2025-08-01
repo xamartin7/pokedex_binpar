@@ -122,4 +122,24 @@ export class PokeApiRepository implements IPokeApiRepository {
     private sleep(ms: number): Promise<void> {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
+
+    async getAllGenerations(): Promise<OneGenerationResponse[]> {
+        try {
+            const generationsResponse = await this.getGenerations();
+            const generationIds = generationsResponse.results.map(gen => {
+                const id = Number(gen.url.split('/')[6]);
+                return id;
+            });
+
+            // Fetch all generations data in parallel for better performance
+            const allGenerations = await Promise.all(
+                generationIds.map(id => this.getOneGeneration(id))
+            );
+
+            return allGenerations;
+        } catch (error) {
+            console.error('Error fetching all generations:', error);
+            throw error;
+        }
+    }
 }

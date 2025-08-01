@@ -13,7 +13,7 @@ export async function PokemonPageClient() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Filters - Left Side */}
         <div className="lg:w-1/4 flex-shrink-0">
-          <Filters generations={allPokemonData.generations} types={allPokemonData.types} />
+          <Filters generations={allPokemonData.generations} types={allPokemonData.typesByGeneration.flatMap(generation => generation.types)} />
         </div>
         
         {/* Pokemon List - Right Side */}
@@ -21,7 +21,7 @@ export async function PokemonPageClient() {
           <PokemonList
             pokemonList={allPokemonData.pokemonList}
             generations={allPokemonData.generations}
-            types={allPokemonData.types}
+            types={allPokemonData.typesByGeneration.flatMap(generation => generation.types)}
         />
         </div>
       </div>

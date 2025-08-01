@@ -81,4 +81,5 @@ export interface IPokeApiRepository {
     getPokemonDetailsByName(name: string): Promise<PokemonDetailsResponse>;
     getPokemonSpeciesByName(name: string): Promise<PokemonSpeciesResponse>;
     getAllPokemons(): Promise<AllPokemonsResponse>;
+    getAllGenerations(): Promise<OneGenerationResponse[]>;
 }

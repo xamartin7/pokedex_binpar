@@ -51,4 +51,30 @@ export class PokemonDataGeneratorFacade implements IPokemonsDataGeneratorFacade 
         }))
         return pokemons
     }
+
+    async generateAllPokemons(): Promise<Pokemon[]> {
+        const allGenerations = await this.pokeApiRepository.getAllGenerations()
+        
+        // Get all unique Pokemon from all generations
+        const allPokemonSpecies = new Map<string, { name: string; url: string }>()
+        
+        allGenerations.forEach(generation => {
+            generation.pokemon_species.forEach(pokemon => {
+                allPokemonSpecies.set(pokemon.name, pokemon)
+            })
+        })
+
+        // Convert to array and process
+        const uniquePokemonList = Array.from(allPokemonSpecies.values())
+        
+        const pokemons = await Promise.all(uniquePokemonList.map(async (pokemon) => {
+            const pokemonId = IdsUrlExtractor.extractIdFromUrl(pokemon.url)
+            if (pokemonId === null) throw new Error(`Pokemon ID is null for ${pokemon.url}`)
+            const pokemonObj = await this.pokemonFactory.createPokemon(pokemonId)
+            pokemonObj.evolutionChain = await this.evolutionChainGenerator.generateEvolutionChain(IdsUrlExtractor.extractIdFromUrl(pokemonObj.evolutionChainUrl)!)
+            return pokemonObj
+        }))
+
+        return pokemons.sort((a, b) => a.id - b.id)
+    }
 }
