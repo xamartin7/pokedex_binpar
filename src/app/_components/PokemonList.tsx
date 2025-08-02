@@ -13,12 +13,13 @@ export function PokemonList({ pokemonList, generations, types }: { pokemonList: 
   const { initializePokemonData, pokemonData } = useFilters();
 
   useEffect(() => {
+    const pokemonsToShow = pokemonData.filteredList.length > 0 ? pokemonData.filteredList : pokemonList
     initializePokemonData({
-      pokemonList,
+      pokemonList: pokemonsToShow,
       generations,
       types,
     })
-  }, [pokemonList, generations, types, initializePokemonData])
+  }, [pokemonList, generations, types, initializePokemonData, pokemonData.filteredList])
 
   return (
     <div className="space-y-6">

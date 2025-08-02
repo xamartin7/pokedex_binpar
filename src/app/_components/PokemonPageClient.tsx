@@ -1,9 +1,6 @@
-
 import { PokemonList } from "./PokemonList";
 import { Filters } from "./filters/Filters";
 import { api } from "@/trpc/server";
-
-
 
 export async function PokemonPageClient() {
   const allPokemonData = await api.pokemon.getAllPokemonData()
