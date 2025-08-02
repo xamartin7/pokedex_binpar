@@ -3,10 +3,23 @@
 import { PokemonCard } from "./PokemonCard";
 import { PaginationSection } from "./PaginationSection";
 import { useFilters } from "@/contexts/FilterContext";
+import { useEffect } from "react";
+import type { Pokemon } from "@/server/modules/pokemon/domain/entities/Pokemon";
+import type { Generation } from "@/server/modules/generations/domain/entities/Generation";
+import type { Type } from "@/server/modules/types/domain/entities/Type";
 
 
-export function PokemonList() {
-  const { pokemonData } = useFilters();
+export function PokemonList({ pokemonList, generations, types }: { pokemonList: Pokemon[], generations: Generation[], types: Type[] }) {
+  const { initializePokemonData, pokemonData } = useFilters();
+
+  useEffect(() => {
+    const pokemonsToShow = pokemonData.filteredList.length > 0 ? pokemonData.filteredList : pokemonList
+    initializePokemonData({
+      pokemonList: pokemonsToShow,
+      generations,
+      types,
+    })
+  }, [pokemonList, generations, types, initializePokemonData, pokemonData.filteredList])
 
   return (
     <div className="space-y-6">

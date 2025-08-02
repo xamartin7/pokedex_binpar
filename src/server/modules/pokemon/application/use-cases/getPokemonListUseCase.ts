@@ -13,4 +13,9 @@ export class GetPokemonListUseCase implements IGetPokemonListUseCase {
     const pokemon = await this.listGeneratorFacade.generateListByGeneration(generationId);
     return pokemon;
   }
+
+  async getAllPokemons(): Promise<Pokemon[]> {
+    const allPokemons = await this.listGeneratorFacade.generateAllPokemons();
+    return allPokemons;
+  }
 }

@@ -65,5 +65,20 @@ export const pokemonRouter = createTRPCRouter({
         console.error('Error getting pokemon details by name:', error)
         throw error
       }
+    }),
+    getAllPokemonData: publicProcedure.query(async () => {
+      try {
+        // Get all pokemons and types for all generations
+        // TODO Can I take advatage of data already fetched from the api in another points of code.
+        // For example, the generations are fetched in getGenerations but inside of getAllTypesByGeneration the code
+        // fetch again all the generations.
+        const generations = await getGenerationsUseCase.getGenerations()
+        const typesByGeneration = await getTypesUseCase.getAllTypesByGeneration()
+        const pokemonList = await getPokemonListUseCase.getAllPokemons()
+        return { generations, typesByGeneration, pokemonList }
+      } catch (error) {
+        console.error('Error getting all pokemon data:', error)
+        throw error
+      }
     })
   })
